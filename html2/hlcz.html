@@ -1,0 +1,510 @@
+﻿<%@ Page Language="C#" AutoEventWireup="false" %>
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>回料称重</title>
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache"> 
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate"> 
+    <META HTTP-EQUIV="expires" CONTENT="0">
+    <link rel="stylesheet" type="text/css" href="../css/base.css" media="screen" />
+    <script type="text/javascript" src="../js/jquery-1.8.2.js"></script>
+    <script src="../js/json2.js" type="text/javascript"></script>
+    <style>
+        .upfile {
+            float: right;
+            width: 60px;
+            height: 40px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            *border-top: 1px solid transparent;
+            _border-top: 1px solid transparent;
+        }
+
+            .upfile .filebtn {
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                line-height: 40px;
+                cursor: pointer;
+                background-color: #bd1738;
+                color: #fff;
+                font-size: 18px;
+            }
+
+        .fileaddress {
+            width: 730px !important;
+        }
+    </style>
+</head>
+<body style="background-image: url(../images/bg1.jpg);" oncontextmenu="self.event.returnValue=false">
+    <div class="ikd_head">
+        <img src="../images/logo.gif" class="ikd_hdImg" />
+        <span class="ikd_hdTit">原材料追溯系统</span>
+        <span class="ikd_hdTit1">极望J9产品追溯系统</span>
+        <div class="ikd_hdCls">
+            <button class="ikd_hdCls1">_</button>
+            <button class="ikd_hdCls2"></button>
+        </div>
+
+        <div class="ikd_hdBtu">
+            <span class="ikd_hdBtu1">操作工：</span>
+            <button class="ikd_hdBtu3" onclick="window.location='/pc/aspx/main.aspx'">返回主页</button>
+
+        </div>
+    </div>
+    <div class="ikd_con">
+        <div class="ikd_cTit">
+            <span class="fl"><i></i>回料称重</span>
+            <%-- <div class="checkbox sgtzbtn" onclick="sgtzbtn()"><div class="box"></div><span>异常操作</span></div> --%>
+        </div>
+        <form id="f1" onsubmit="return false">
+            <input type="hidden" name="FCompanyID" id="FCompanyID" value="0" />
+            <table class="ikd_cB ikd_cB1" border="0" style="width: 985px">
+                <tr style="z-index: 1;">
+                    <td>
+                        <label class="ikd_cbTit">
+                            所属工厂
+                        </label>
+                    </td>
+                    <td colspan="2">
+                        <!-- onclick="selectMore(this)" -->
+                        <div id="gongchang123" onclick="selectMore(this)">
+                            <input class="ikd_cbTxt ewm" id="factory" required  readonly/>
+                            <%-- <input type="button" class="ikd_cbSet" /> --%>
+                        </div>
+                        <ul class="ikd_cbLt ikd_cbLt0"></ul>
+                    </td>
+                </tr>
+                <tr style="z-index: 1;">
+                    <td>
+                        <label class="ikd_cbTit">
+                            材料牌号
+                        </label>
+                    </td>
+                    <td>
+                        <div id="dibnan123" onclick="selectDB(this)">
+                            <input class="ikd_cbTxt ikd_cbTxt1" id="DBlist" required/>
+                            <input type="button" class="ikd_cbSet" />
+                        </div>
+                        <ul id="dibanlists" class="ikd_cbLt ikd_cbLt0"></ul>
+                    
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            操作工二维码
+                        </label>
+                    </td>
+                    <td>
+                        <input class="ikd_cbTxt ewm" id="FYG"  ewm="yg" />
+                        <input type="hidden" name="FYG" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            桶二维码
+                        </label>
+                    </td>
+                    <td>
+                        <input class="ikd_cbTxt ewm" required id="FBucketNumberShowData" ewm="czt" />
+                        <input type="hidden" name="FBucketNumber" id="FLDNumber" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            桶重
+                        </label>
+                    </td>
+                    <td>
+                        <input class="ikd_cbTxt num" name="FBWeight" required id="FBucketWeight" readonly />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            总重量
+                        </label>
+                    </td>
+                    <td>
+                        <div class="upfile">
+                            <div class="filebtn" onclick="updateAllTongStatus(this)">
+                                确认
+                            </div>
+                        </div>
+                        <input class="ikd_cbTxt num fileaddress input4" name="FWeightSum" required id="FWeightSum" data-usb="weak" readonly/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            净重
+                        </label>
+                    </td>
+                    <td>
+                        <input class="ikd_cbTxt num" name="FNetweight" required readonly id="FNetweight" />
+                        <div style="position:absolute;left:2px;top:42px;z-index:999999999;color:#fff;width:380px;height:190px;">
+                            <div id="temp456" style="color:#e2dddd;font-size:12px;"></div>
+                        </div>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td colspan="2" class="formoperation">
+            
+                        <input type="button" value="历史记录" class="ikd_cbBtu" tabindex="7"  onclick="history()" />
+                        <input type="button" value="确定" class="ikd_cbBtu" tabindex="6" id="form_submit"  onclick="confirm()"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+</html>
+<script src="../js/common.js"></script>
+<script src="../js/layui/layui.all.js"></script>
+<script type="text/javascript" src="/Scripts/XSBApi.js"></script>
+<script type="text/javascript" b="by panbb 新增加方法">
+    //地磅上是否存在物体 ponderation true存在物品 false不存在物品
+    var ponderation = false;
+    var startCZ = true;//默认启动称重
+    var handwork =0 ;//称重是否手工处理 1手工处理，0自动获取
+    var zeroindex = 0;
+    var zeroArr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  //  var zeroArr = [0, 0];
+     //吨位数值过磅起始重量
+    var _v = 0.1;
+    var MyclientHub;
+    //接收signalR数据
+    function receive(data) {
+
+		if (data.indexOf("{") != -1 && data.indexOf(":") != -1 && data.indexOf("}") != -1  && data.indexOf("status") != -1 && data.indexOf("type") != -1 
+            && data.indexOf("称重") != -1 && data.indexOf("time") != -1 && data.indexOf("类型") != -1) {
+            
+			var ret = JSON.parse(data);
+			$("#temp456").html(data);
+
+            if (ret["类型"] == "称重" && ret["status"] == 200) {
+
+                //实时重量
+                var FWeightSum = ret["称重"] || 0;
+                //桶重
+                var FNUM = $("#FBucketWeight").val() || 0; 
+                //   console.log('zeroindex:' + zeroindex);
+                //超范围从新计数
+                if (zeroindex >= zeroArr.length) zeroindex = 0;
+                //赋值
+                zeroArr[zeroindex] = parseInt(FWeightSum || 0);
+                //索引计数器
+                zeroindex++;
+
+                //临时变量
+                var _tem = false;
+                //循环所有值，是否都是小于吨位
+                for (var x in zeroArr) if (zeroArr[x] >= _v) _tem = true;
+                //都是小于吨位的，则隐藏弹框，反之，则显示
+                if (_tem) ponderation = true; else ponderation = false;
+
+                //当吊秤上重量大于过载重量显示
+                if(ponderation && startCZ){
+                    $("#FWeightSum").val(FWeightSum);   
+                    $("#FNetweight").val(FWeightSum - FNUM);
+                }
+
+            }else{
+                //错误数据，输出到后台，方便排查时，可见！
+                console.log('error data:' + data);
+             }
+		}else{
+			$("#temp456").html(data);
+	    }
+    }
+    $(function () {
+        XSBApi.socket({
+            //服务器地址
+            ip: "127.0.0.1",
+            //端口号
+            port: "35051"
+        }, function (opt) {
+            MyclientHub = opt;
+         //   console.log(opt);
+
+        });
+    })
+    //发送
+</script>
+<script>
+    var layer = layui.layer;
+    var cid = getUrlname("cid") || 0;//默认未传参数为0下来工厂信息显示所有工厂
+    $(document).ready(function(){
+       layer.msg('当前页面版本:v1.0.40');
+        var FEmplname =  localStorage.getItem("FEmplname") || "";
+        $(".ikd_hdBtu1").text("操作工:" + FEmplname);
+        $("#FYG").val(FEmplname);
+        com.usb.init(scandata); 
+        getCailiao();
+        getGCList();
+    })
+
+    function history(){
+        if (localStorage.getItem('FCompanyID') == undefined || localStorage.getItem('FCompanyID') == '') {
+            layer.msg('当前无工厂信息<br/>请选择工厂信息才可以查看历史记录！')
+        } else {
+            var FEmplname =  localStorage.getItem("FEmplname") || "";
+            var nameTran = escape(FEmplname);
+            var FEmplID = localStorage.getItem("FEmplID") || "";
+            location.href="history4.html?a=2&FCompanyID=" + cid + "&FEmplID=" + FEmplID +"&FEmplname=" + nameTran;
+        }
+    }
+
+    function selectMore(dom, e) {
+        e = e || window.event;
+        e.stopPropagation();
+        var ul = $(dom).next();
+        ul.toggle();
+        ul.find('li').click(function () {
+            $('#factory').val($(this).text()).attr('fid', $(this).attr('fid'));
+	    $('#factory').attr('fid', $(this).attr('fid'));
+            ul.hide();
+            getDefaultGC();
+        });
+        $(document).on('click', function () {
+            ul.hide();
+        })
+    }
+
+    //默认工厂
+    function getDefaultGC() {
+        localStorage.FCompanyID = $('#factory').attr('fid');
+        localStorage.FCompanyName = $('#factory').val();
+    }
+
+    //工厂下拉
+    function getGCList() {
+        if (localStorage.FCompanyName != undefined && localStorage.FCompanyID != undefined) {
+            $('#factory').val(localStorage.FCompanyName).attr('fid', localStorage.FCompanyID);
+        }
+
+        //所属工厂api39652
+        com.submit('api39652', {FCompanyID:cid}, function (data) {
+            // console.log(data);
+            try {
+                var html = '';
+                data.ds.forEach(function (value) {
+                    html += '<li fid="' + value.FCompanyID + '">' + value.FCompanyName + '</li>'
+                });
+                $('#factory').parent('div').next().html(html);
+                //触发下拉事件
+                $("#gongchang123").click();
+            } catch (e) {
+                console.error(e)
+            }
+        })
+    }
+
+    //确认计算净重
+    function updateAllTongStatus(){
+        var FWeightSum = $("#FWeightSum").val()||0; //总重量
+        var FBWeight = $("#FBucketWeight").val()||0;   //桶重
+
+        if (!$("#FBucketNumberShowData").attr("FQRCodeCZTID")){
+           layer.msg("请扫描称重桶二维码！");
+           return false;
+        }        
+        if(FWeightSum===0){
+           layer.msg("吊秤数据未接收到请检查或手工处理！");
+           $("#FNetweight").val("");
+           return false;
+        }
+        if((FWeightSum - FBWeight)<=0){
+           layer.msg("手工输入的总重量必须大于桶重！");
+           $("#FNetweight").val("");
+           return false;
+        }
+
+        //计算净重
+        $("#FNetweight").val(FWeightSum - FBWeight);
+    }
+
+    /* 手工调整 */
+    function sgtzbtn() {
+        if (localStorage.getItem("FEmplID") == undefined || localStorage.getItem("FEmplID") == '') {
+            layer.msg('请扫描员工信息！');
+            return false;
+        }  
+        if (!$("#DBlist").val()){
+            layer.msg("请选择材料牌号！");
+            return false;
+        }
+        if (!$("#FBucketNumberShowData").attr("FQRCodeCZTID")){
+           layer.msg("请扫描称重桶二维码！");
+           return false;
+        }
+        
+        if (startCZ) {  
+            //console.log("开启手工处理");
+            $(".sgtzbtn").find(".box").addClass("active");
+            $("#FWeightSum").removeClass("ikd_cbTxt").attr("readonly", false);     
+            $("#FWeightSum").focus();
+            
+            $("#FWeightSum").val("");                
+            $("#FNetweight").val("");
+            //设置当前吊秤为手工模式
+            startCZ=false;
+            handwork=1;
+        } else {
+            //console.log("关闭手工处理");
+            $(".sgtzbtn").find(".box").removeClass("active");
+            $("#FWeightSum").addClass("ikd_cbTxt").attr("readonly", true);   
+            $("#FWeightSum").blur();         
+
+            $("#FWeightSum").val("");                
+            $("#FNetweight").val("");
+            //设置当前吊秤为自动模式
+            startCZ=true;
+            handwork=0;
+        }
+    }
+
+    //展示材料牌号下拉列表
+    function selectDB(_this){
+        var datas = $(_this).data("data-allData");
+        if(datas.length==undefined){
+            return;
+        }
+        var key = 0;
+        var str = "";
+        for(;key<=datas.length - 1;key++){
+            str += '<li onclick="hideLie(this)" data-name="' + datas[key].name + '" data-FCLPHMain="' + datas[key].FCLPHMain + ' ">' + datas[key].name + '</li>';
+        }
+        $("#dibanlists").html(str)
+        $("#dibanlists").show()
+        
+    }
+
+
+    //隐藏下拉列表，填入默认选中的材料牌号值
+    function hideLie(_this){
+       var FCLPHMain = $(_this).attr("data-FCLPHMain");
+	var name = $(_this).attr("data-name");
+       $("#DBlist").val(name);
+	$("#DBlist").attr("data-FCLPHMain",FCLPHMain );
+       $("#dibanlists").hide()
+    } 
+
+    //获取材料牌号信息
+    function getCailiao(){
+        //FCompanyID:localStorage.getItem('FCompanyID')
+      
+        com.submit("获取材料牌号",{FCompanyID:cid},function(ret){
+            try {
+                if (ret.ds[0].status === "000000") {
+                    var datas = ret.ds1;
+                    var str = "";
+                    //$("#DBlist").attr("data-FCLPHMain",ret.ds1[0].FCLPHMain);
+					//$("#DBlist").val(ret.ds1[0].name);
+                    $("#dibnan123").data("data-allData",ret.ds1);
+                } else {
+                    layer.msg(ret.ds[0].msg)
+                }
+            } catch (e) {
+                console.error(e)
+            }
+
+        })
+    }
+
+// 获取地址栏参数
+    function getUrlname(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+
+function scandata(code){
+    if(code.length === 6){
+        com.submit("api40248",{FCardCode:code},function(ret){
+            try {
+                if (ret && ret.ds[0].status === "000000") {
+                    localStorage.setItem("FEmplname",ret.ds1[0].FEmplname);
+                    localStorage.setItem("FEmplID",ret.ds1[0].FEmplID);
+                    $(".ikd_hdBtu1").text("操作工:" + ret.ds1[0].FEmplname);
+                    $("#FYG").val(ret.ds1[0].FEmplname);
+
+                } else {
+                    layer.msg(ret.ds[0].msg);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        })
+    }else if(code.charAt(0) === "{"){
+        var obj = JSON.parse(code);
+        var FCode = obj.n;
+        if (obj.q == 'CZT') {
+            com.submit("称重桶扫描",{
+                FCode:FCode,
+                FCompanyID:localStorage.getItem('FCompanyID')
+            },function(ret){
+                try {
+                    if (ret && ret.ds[0].status === "000000") {
+                        //console.log(ret);
+                        $("#FBucketNumberShowData").attr("FQRCodeCZTID",ret.ds1[0].FQRCodeCZTID);
+			            $("#FBucketNumberShowData").attr("FCode",ret.ds1[0].FCode);
+                        $("#FBucketNumberShowData").val(ret.ds1[0].FName);
+                        $("#FBucketWeight").val(ret.ds1[0].FNUM);
+                    } else {
+                        layer.msg(ret.ds[0].msg);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    }
+                })
+
+        }else{
+            layer.msg("二维码格式不正确", { icon: 2 });
+        }
+
+    }else{
+        layer.msg("二维码格式不正确", { icon: 2 })
+    }
+}
+
+function confirm(){
+	//alert($("#DBlist").attr("data-FCLPHMain"));
+    com.submit("insertHLOutDeliver",{
+        FCompanyID:localStorage.getItem('FCompanyID'),
+        FCLPH:$("#DBlist").attr("data-FCLPHMain").trim(),    //材料牌号
+        FBucketNumber:$("#FBucketNumberShowData").attr("FCode"),  //桶编号
+        FYG:localStorage.getItem("FEmplID"),   //操作工
+        FWeightSum:$("#FWeightSum").val(),  //总重量
+        FBWeight:$("#FBucketWeight").val(),   //桶重
+        FCZhandwork:handwork,/**是否手工提交重量 0否 1是 **/
+	    BLCompanyID:cid
+    },function(ret){
+        try {
+            if (ret && ret.ds[0].status === "000000") {
+                location.reload();
+            } else {
+                layer.msg(ret.ds[0].msg);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    })
+}
+
+</script>
+
+
+
+
+

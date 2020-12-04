@@ -1,0 +1,1673 @@
+
+
+
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>铝水称重</title>
+    <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" type="text/css" href="../css/base.css?a=41" media="screen"/>
+    <script type="text/javascript" src="../js/jquery-1.8.2.js"></script>
+    <script>
+        $(function () {
+            var _href = window.location.href;
+        })
+</script>
+    <script src="../js/json2.js" type="text/javascript"></script>
+    <script src="../js/jquery.validate.min.js" type="text/javascript"></script>
+    <script src="../js/layer/layer.js"></script>
+    <script type="text/javascript" src="../js/api1.js"></script>
+    <!--by panbb 新增加方法，SignalR  begin-->
+    <script type="text/javascript" src="/Scripts/jquery.y9socket.min.js"></script>
+    <script type="text/javascript" src="/Scripts/XSBApi.js"></script>
+    <!--by panbb 新增加方法，SignalR  end-->
+    <script type="text/javascript" b="by panbb 新增加方法">
+        //地磅上是否存在物体 ponderation true存在物品 false不存在物品
+        var ponderation = false;
+        var zeroindex = 0;
+        var zeroArr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      //var zeroArr = [0, 0];
+         //吨位数值过磅起始重量
+        var _v = 500;
+
+        var MyclientHub;
+        //接收signalR数据
+        function receive(data) {
+            //console.clear();
+           // console.log("SignalR:" + data);
+            try {
+                //字符串验证，非符合字符串一律不进行逻辑处理
+                if (data.indexOf("{") != -1 && data.indexOf(":") != -1 && data.indexOf("}") != -1
+                    && data.indexOf("地磅数据") != -1 && data.indexOf("称重") != -1 && data.indexOf("status") != -1
+                    && data.indexOf("time") != -1 && data.indexOf("类型") != -1) {
+                    $("#temp456").html(data);
+                    //字符串，转换成Json对象
+                    var ret = JSON.parse(data);
+                    //验证是否正确的数据
+                    if (ret["类型"] == "称重" && ret["status"] == 200) {
+                        //显示重量信息到界面上
+			if(ret["称重"]>0)
+			{                
+                        	$("#sszl").text(ret["称重"]);
+                            $(".sizeInput>input[name=sizeweight]").val(ret["称重"]);
+                            try{
+                                var elements = $(".chazhi>button[tag=1]");
+                                if(elements.length == 1){
+                                    var result = elements.text();
+                                    var weight =  $(".sizeInput>input[name=sizeweight]").val();
+                                    if(weight){
+                                        var jieguo = Math.abs(weight - result * 1000);
+                                        $("input[name=sizesum]").val(jieguo)
+                                    }
+                                }    
+                            }catch(e){    
+
+                            }
+                        
+			}
+
+                     //   console.log('zeroindex:' + zeroindex);
+                        //超范围从新计数
+                        if (zeroindex >= zeroArr.length) zeroindex = 0;
+                        //赋值
+                        zeroArr[zeroindex] = parseInt(ret["称重"] || 0);
+                        //索引计数器
+                        zeroindex++;
+
+                       //临时变量
+                        var _tem = false;
+                        //循环所有值，是否都是小于吨位
+                        for (var x in zeroArr) if (zeroArr[x] >= _v) _tem = true;
+                        //都是小于吨位的，则隐藏弹框，反之，则显示
+                        if (_tem) ponderation = true; else ponderation = false;
+
+                       //  console.log('_v:' + _v);                        
+                      //   console.log('ret["称重"]:'+ret["称重"]);
+                       //  console.log('zeroArr:' + JSON.stringify(zeroArr));
+                       //  console.log('ponderation:'+ponderation);
+                        
+                          //执行跳用业务方法
+                          openCZsockt();
+
+                       // console.log("sszl:" +  $("#sszl").html());                       
+                       // upDbStatuts(ret["称重"]);
+
+                    } else {
+                        //错误数据，输出到后台，方便排查时，可见！
+                        console.log('cz data:' + data);
+                        hideCZ();
+                    }
+                }
+            } catch (e) { }
+        }
+
+        $(function () {
+            XSBApi.socket({
+                //服务器地址
+                ip: "127.0.0.1",
+                //端口号
+                port: "35051"
+            }, function (opt) {
+                MyclientHub = opt;
+            });
+        })
+        //发送
+    </script>
+    <script type="text/javascript" b="by panbb 新增加方法">
+        var MyclientHub1;
+        var cenoll = '',_WD='0'; 
+    //接收signalR数据
+    function receive1(data) {
+       // console.log(data)
+        try {
+            $("#temp789").html('下限温度='
+                    + DBoption.FTemperature + ';设置的通道='
+                    + DBoption.FChannel);
+	        $("#temp789").html(data);
+        } catch (e) {
+        }
+       // console.log(data);
+        try {
+            if (data.indexOf("{") != -1 && data.indexOf(":") != -1 && data.indexOf("}") != -1
+                    && data.indexOf("温度数据") != -1 && data.indexOf("type") != -1 && data.indexOf("status") != -1
+                    && data.indexOf("温度") != -1 && data.indexOf("通道") != -1 && data.indexOf("time") != -1 && data.indexOf("类型") != -1) {
+                /*温度,逻辑*/
+                // console.log('wd data:' + data + ';FTemperature=' + DBoption.FTemperature + ';FChannel=' + DBoption.FChannel);
+                var ret = JSON.parse(data);
+                // {"类型":"温度","温度":"695"}
+                if (ret["类型"] == "温度") {
+                    //当前为系统采集开启数据对接
+                    if (handwork == 0) {
+                        cenoll = ret["通道"];
+                        _WD = ret["温度"];
+                        openWDsockt();
+                        if (DBoption.FTemperature <= ret["温度"] && DBoption.FChannel == ret["通道"]) {  
+                            if (ret["温度"] > maxwd) {
+                                maxwd = ret["温度"];
+                                wdnum = 0;
+                            } else {
+                                wdnum++;
+                            }
+                            $("#max_wendu").text(maxwd);
+                            $("#ss_wendu").text(ret["温度"]);
+
+                            if (wdnum > 2) {
+                                $("#max_wendu").css("color", "red");
+                            } else {
+                                $("#max_wendu").css("color", "#333333");
+                            }
+                        } 
+                    }                            
+                }
+
+            }
+        } catch (e) { }
+    }
+
+      
+        function reqData(){
+            $.ajax({
+                url : 'http://10.65.23.98:9091/',
+                type:"get",
+				data:{port:DBoption.FChannel},
+                success:function(ret){
+					
+                    receive1(ret)
+                },
+                error:function(xhr,status,error){
+                    console.log(xhr)
+                    console.log(status)
+                    console.log(error)
+                }
+            })
+            setTimeout(reqData,800)
+        }
+        $(function(){
+            //reqData()  
+        })
+    </script>
+    <script src="../js/common.js?a=1"></script>
+    <style>
+        .upfile {
+            float: right;
+            width: 60px;
+            height: 40px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            *border-top: 1px solid transparent;
+            _border-top: 1px solid transparent;
+        }
+
+        .upfile .filebtn {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            background-color: #bd1738;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .fileaddress {
+            width: 730px !important;
+        }
+
+        .sizeBox{
+            color:white;
+            width:90%;
+            height: 40px;
+            margin-top:4%;
+        }
+        
+        .layui-layer-btn0,.layui-layer-btn1 {
+            display: block;
+            width: 100px;
+            font-size: 22px;
+            text-align: center;
+            height: 40px !important;
+            line-height: 40px !important;
+            background-color: rgb(189, 23, 56) !important;
+            border: none !important;
+            color:white !important;
+        }
+
+        .showOpen {
+            background: rgba(0, 0, 0, .8) !important;
+        }
+        .sizeName{
+            width:20%;
+            float:left;
+            font-size: 16px;
+            line-height: 40px;
+            text-indent: 1em;
+            background: rgb(85,85,85);
+        }
+        .sizeInput{
+            float: left;
+            width:78%;
+            margin-left: 2%;
+        }
+        .sizeInput>input{
+            width: 100%;
+            height: 40px;
+            background: rgb(85,85,85);
+            border:none;
+            color:#ffff00;
+            font-size: 16px;
+            text-indent: 1em;
+        }
+    </style>
+    <script src="../js/wstk.js?a=182"></script>
+    <!--<script src="../js/Lodop/common.js"></script>-->
+    <script src="../js/Lodop/LodopFuncs.js"></script>
+    <script src="../js/Lodop/jwPrintList_shi.js?a=2"></script>
+    <script type="text/javascript">
+        $(function () {
+            layer.msg('当前页面版本:v1.0.46');
+        })
+    </script>
+</head>
+<body style="background-image: url(../images/bg1.jpg);" oncontextmenu="self.event.returnValue=false">
+   
+<div class="ikd_head">
+    <img src="../images/logo.gif" class="ikd_hdImg"/>
+    <span class="ikd_hdTit">原材料追溯系统</span>
+    <span class="ikd_hdTit1">极望J9产品追溯系统</span>
+
+
+    <div class="ikd_hdCls">
+        <button class="ikd_hdCls1">_</button>
+        <button class="ikd_hdCls2"></button>
+    </div>
+
+    <div class="ikd_hdBtu">
+        <span class="ikd_hdBtu1">操作工：<i id="CZG"></i></span>
+       <!-- <button class="ikd_hdBtu3" onclick="outlogin()">退出登录</button>-->
+        <button class="ikd_hdBtu3" onclick="window.location='/pc/aspx/main.aspx'">返回主页</button>
+
+    </div>
+</div>
+<!--内容 begin-->
+<div class="ikd_con">
+    <div class="ikd_cTit">
+        <span class="fl"><i></i>铝水称重</span>
+        <div class="checkbox sgtzbtn" onclick="biaoding()">
+            <div class="box"></div><span>标定</span>
+        </div>
+        <div class="checkbox sgtzbtn" onclick="sgtzbtn()"><div class="box"></div><span>异常操作</span></div>
+    </div>
+    <form id="f1" onsubmit="return false">
+        <input type="hidden" name="FCompanyID" id="FCompanyID" value="0"/>
+        <table class="ikd_cB ikd_cB1" border="0" style="width: 985px">
+            <tr>
+                <td>
+                    <label class="ikd_cbTit">
+                        地磅名称
+                    </label>
+                </td>
+                <td colspan="2">
+                    <!-- onclick="selectDB(this)" -->
+                    <div id="dibnan123" onclick="selectDB(this)">
+                        <input class="ikd_cbTxt ikd_cbTxt1" id="DBlist" required/>
+                        <input type="button" class="ikd_cbSet" />
+                    </div>
+                    <ul id="dibanlists" class="ikd_cbLt ikd_cbLt0"></ul>
+                </td>
+            </tr>
+            <tr style="z-index: 1;">
+                <td>
+                    <label class="ikd_cbTit">
+                        所属工厂
+                    </label>
+                </td>
+                <td colspan="2">
+                    <input class="ikd_cbTxt ewm" id="factory" required ewm="yg" />
+                    <!--<div onclick="selectMore(this)">-->
+                    <!--<input class="ikd_cbTxt ikd_cbTxt1" id="factory" required/>-->
+                    <!--<input type="button" class="ikd_cbSet"/>-->
+                    <!--</div>-->
+                    <!--<ul class="ikd_cbLt ikd_cbLt0"></ul>-->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ikd_cbTit">
+                        员工二维码
+                    </label>
+                </td>
+                <td colspan="2">
+                    <input class="ikd_cbTxt ewm" required id="FCardNo" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ikd_cbTit">
+                        汤包编号
+                    </label>
+                </td>
+                <td colspan="2">
+                    <input class="ikd_cbTxt ewm" id="TBCode" required ewm="yg" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ikd_cbTit">
+                        总重量
+                    </label>
+                </td>
+                <td>
+                    <input class="ikd_cbTxt num fileaddress" name="FBWeight" required id="FBucketWeight" readonly />
+                </td>
+                <td rowspan="2">
+                    <div class="upfile" style="height: 90px;line-height: 90px;">
+                        <div class="filebtn" onclick="getzzl(this)" style="line-height: 1.2; font-size: 20px;font-weight: bold; padding: 21px 0;height: auto;">
+                            称 <br>重
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ikd_cbTit">
+                        空汤包重
+                    </label>
+                </td>
+                <td>
+                    <input class="ikd_cbTxt num fileaddress" name="FWeightSum" required id="FWeightSum" value=""/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ikd_cbTit">
+                        净重
+                    </label>
+                </td>
+                <td colspan="2">
+                    <input class="ikd_cbTxt num" name="FNetweight" required readonly id="FNetweight" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ikd_cbTit">
+                        温度
+                    </label>
+                </td>
+                <td colspan="2">
+                    <!--<input class="ikd_cbTxt num" name="wendu" required readonly id="wendu" />-->
+                    <input class="ikd_cbTxt num input4" id="wendu" data-usb="weak" readonly/>
+                    <!--<input type="number" class="input4" id="wendu"/>-->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="position:absolute;left:2px;top:42px;z-index:999999999;color:#fff;width:380px;height:190px;">
+                        <div id="temp123" style="color:#e2dddd;font-size:12px;"></div>
+                        <div id="temp456" style="color:#e2dddd;font-size:12px;"></div>
+                        <div id="temp789" style="color:#e2dddd;font-size:12px;"></div>
+                    </div>
+                    <label class="ikd_cbTit">
+                        称重类型
+                    </label>
+                </td>
+                <td colspan="2" class="czalert">
+                    <div class="tbbox clearfix" style="margin-top: 0;">
+                        <div class="tbbox2" id="manbaocheck1"><div class="box"></div><span>满包</span></div>
+                        <div class="tbbox2" id="cewencheck1"><div class="box"></div><span>测温</span></div>
+                        <div class="tbbox2" id="kongbaocheck1"><div class="box"></div><span>空包</span></div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="formoperation">
+
+                    <input onclick="history()" type="button" value="历史记录" class="ikd_cbBtu" tabindex="7"/>
+                    <input onclick="setWendu()" type="button" value="确定" class="ikd_cbBtu" tabindex="6"/>
+                    <!--<input onclick="history()" type="button" value="手工调整" class="ikd_cbBtu" tabindex="5"/>-->
+                </td>
+            </tr>
+        </table>
+
+        <div class="z-alert czalert" id="zlalert" style="display: none;">
+            <div class="z-alert_box">
+                <div class="closebox" onclick="hideCZ()"><img src="../images/close2.png" alt=""></div>
+                <div class="z-alert_main">
+                    <table border="0" style="width: 100%">
+                        <tr>
+                            <td width="50px"><span class="t1">重量</span></td>
+                            <td>
+                                <div id="sszl" style="width: 346px; overflow:hidden; text-align: center" class="input1"></div>
+                            </td>
+                            <td width="50">
+                                <span style="font-size: 60px; color:#ffffff;">KG</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="tbbox clearfix">
+                        <div class="tbbox1"><span>汤包</span> <div class="input2" id="TBnumber"></div></div>
+                        <div class="tbbox2" id="manbaocheck"><div class="box"></div><span>满包</span></div>
+                        <div class="tbbox2" id="kongbaocheck" style="float: right;"><div class="box"></div><span>空包</span></div>
+                    </div>
+                    <div class="tbbox clearfix">
+                        <div class="tbbox1"><span>员工</span> <div class="input2" id="ygname"></div></div>
+                        <div class="qrbrn weightconfirm">等待中...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="z-alert_bg"></div>
+        </div>
+
+        <div class="z-alert wdalert" id="wdalert" style="display: none;">
+            <div class="z-alert_box">
+                <div class="closebox" onclick="hideWD()"><img src="../images/close2.png" alt=""></div>
+                <div class="z-alert_main">
+                    <table border="0" style="width: 100%">
+                        <tr>
+                            <td width="80px"><span class="t1">最大温度</span></td>
+                            <td>
+                                <div id="max_wendu" style="width: 100%; overflow:hidden; text-align: center" class="input1"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="80px" style="padding-top: 20px"><span class="t2">实时温度</span></td>
+                            <td style="padding-top: 20px">
+                                <div id="ss_wendu" style="width: 100%; overflow:hidden; text-align: center" class="input2"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="80px"></td>
+                            <td style="padding-top: 20px">
+                                <div class="qrbrn" onclick="wdqrbtn()">确认</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="z-alert_bg"></div>
+        </div>
+
+
+        <div class="z-alert qralert" id="qralert" style="display: none;">
+            <div class="z-alert_box">
+                <div class="closebox" onclick="hideQR()"><img src="../images/close2.png" alt=""></div>
+                <div class="z-alert_main">
+                    <table border="0" style="width: 100%">
+                        <tr>
+                            <td width="40%"><span class="t2">密度检验结果</span></td>
+                            <td style="padding-top: 10px"><div class="input2" id="jieguo1"></div></td>
+                        </tr>
+                        <tr>
+                            <td><span class="t2">K模检验结果</span></td>
+                            <td style="padding-top: 10px"><div class="input2" id="jieguo2"></div></td>
+                        </tr>
+                        <tr>
+                            <td><span class="t2">温度检验结果</span></td>
+                            <td style="padding-top: 10px"><div class="input2" id="jieguo3"></div></td>
+                        </tr>
+                        <tr>
+                            <td><span class="t2">检验判定结果</span></td>
+                            <td style="padding-top: 10px"><div class="input2" id="jieguo4"></div></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding-top: 15px;margin-bottom:15px;" align="right">
+                               <label class="z-checkbox" style="margin-left: 10px;">
+                                    <input class="inputradio" value="0" type="radio" name="jytype" id="jytype0" disabled>
+                                    <i class="z-checked"></i>
+                                    <span class="z-checktxt">手工放行</span>
+                                </label>
+                                
+                             <!--   
+                                <label class="z-checkbox" style="margin-left: 10px;">
+                                    <input class="inputradio" value="1" type="radio" name="jytype" id="jytype1" disabled>
+                                    <i class="z-checked"></i>
+                                    <span class="z-checktxt">保温加温</span>
+                                </label>
+                            -->
+                                <label class="z-checkbox" style="margin-left: 10px;">
+                                    <input class="inputradio" value="2" type="radio" name="jytype" id="jytype2" disabled>
+                                    <i class="z-checked"></i>
+                                    <span class="z-checktxt">除气除渣</span>
+                                </label>
+                                <label class="z-checkbox" style="margin-left: 10px;">
+                                    <input class="inputradio" value="3" type="radio" name="jytype" id="jytype3" disabled>
+                                    <i class="z-checked"></i>
+                                    <span class="z-checktxt">直接报废</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td style="padding-top: 20px">
+                                <div class="qrbrn" onclick="tjqrbtn()">确认</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="z-alert_bg"></div>
+        </div>
+
+        <!-- style="display: none;" -->
+        <div class="z-alert qralert qralert2 qralert2_t1" id="qralert2" style="display: none;">
+            <div class="z-alert_box">
+                <div class="closebox" onclick="alert2_hide()"><img id="qralert2Close" src="../images/close2.png" alt=""></div>
+                <div class="z-alert_main z-row z-row-column z-row-center">
+                    <div>
+                        <div id="TBnumber2" class="tbnumber"></div>
+                        <div class="alertT2">OK</div>
+                        <div class="alertT1">NG</div>
+                        <div>
+                            <div class="z-checklist">
+                                <label class="z-checkbox" style="margin-top: 10px;margin-left: 10px;">
+                                    <input class="inputradio" value="0" type="radio" name="jytype2" id="jytype0_2" disabled/>
+                                    <i class="z-checked" style="height: 75px;width: 75px;"></i>
+                                    <span class="z-checktxt">手工放行</span>
+                                </label>                          
+                            </div>
+                            <!--
+                            <div class="z-checklist">
+                                 <label class="z-checkbox" style="margin-left: 10px;">
+                                    <input class="inputradio" value="1" type="radio" name="jytype2" id="jytype1_2" disabled>
+                                    <i class="z-checked"></i>
+                                    <span class="z-checktxt">保温加温</span>
+                                </label>                          
+                            </div>
+                            -->
+                            <div class="z-checklist">
+                                <label class="z-checkbox" style="margin-top: 30px;margin-left: 10px;">
+                                    <input class="inputradio" value="2" type="radio" name="jytype2" id="jytype2_2" disabled/>
+                                    <i class="z-checked" style="height: 75px;width: 75px;"></i>
+                                    <span class="z-checktxt">除气除渣</span>
+                                </label>
+                            </div>
+                            <div class="z-checklist">
+                                <label class="z-checkbox" style="margin-top: 30px;margin-left: 10px;">
+                                    <input class="inputradio" value="3" type="radio" name="jytype2" id="jytype3_2" disabled/>
+                                    <i class="z-checked" style="height: 75px;width: 75px;"></i>
+                                    <span class="z-checktxt">直接报废</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                    </div>                
+
+                </div>
+            </div>
+            <div class="z-alert_bg"></div>
+        </div>
+    </form>
+    <!--<button class="ikd_cBtu"></button>-->
+</div>
+<!--内容 end-->
+</body>
+<script>
+// 获取地址栏参数
+    function getUrlname(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+    /* 弹出框 是否自动弹出 状态 */
+    var ft = 1;
+    var wendutype = 2;
+    var DBoption = {};
+    var jydata = {};    
+    var handwork = 0;//是否手工提交标记 0 系统采集 1手工
+    var cid = getUrlname("cid") || 0;//默认未传参数为0下来工厂信息显示所有工厂
+    function biaoding(){
+        var str = $(".weight").html();
+        layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            zIndex: 99,
+            shadeClose: false,
+            skin: "showOpen",
+            area: ['80%', '60%'],
+            content: str,
+            btn: ["确定","退出"],
+            yes:function(index){
+                var FBZ = null;
+                var elements = $(".chazhi>button[tag=1]");
+                if(elements.length == 1){
+                    FBZ = elements.text();
+                }else{
+                    FBZ = "" 
+                }
+                var FCZ = $("input[name=sizesum]").val();
+                var sizedb = $(".sizeInput>input[name=sizedb]").val();
+                var sizeweight = $(".sizeInput>input[name=sizeweight]").val();  
+                com.submit("api56189",{
+                    FBZ:FBZ + "000",
+                    FDB: sizedb,
+                    FWT: sizeweight,
+                    FCZ:FCZ
+                },function(ret){
+                    try{
+                        if(ret.ds[0].status == "000000"){
+                            layer.msg(ret.ds[0].msg,{
+                                zIndex:9999999
+                            });
+                        }else{
+                            layer.msg(ret.ds[0].msg,{
+                                zIndex:9999999
+                            });
+                            return false;
+                        }
+
+                    }catch(e){
+                        
+                    }
+                })
+            },
+            "btn2":function(index){
+                $(".chazhi>button").css({"background":"#bd1738","color":"white"})
+                $(".chazhi>button").attr("tag",0)
+                layer.close(index)
+            }
+        });
+        $(".sizeInput>input[name=sizedb]").val($("#DBlist").val());
+    }
+
+
+
+
+    /* 手工调整 */
+    function sgtzbtn() {
+        if (DBoption.FTruckscalesID == undefined || DBoption.FTruckscalesID == '') {
+            layer.msg('请扫描地磅信息！');
+            return false;
+        }        
+        if ($("#TBnumber").text() == undefined || $("#TBnumber").text() == "") {
+            layer.msg("请扫描汤包二维码");
+            return false;
+        }
+        if ($('#factory').attr('fid') == undefined ||  $('#factory').attr('fid') == "") {
+            layer.msg("请选择工厂");
+            return false;
+        }
+        if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined){
+            layer.msg("请扫描员工信息！");
+            return false;
+        }
+        if (TBdata.FSoupCZID == undefined || TBdata.FSoupCZID == ""){
+            layer.msg("当前汤包未找到出汤记录，请核实情况");
+            return false;
+        }
+        if (TBdata.FFullWeight == undefined || TBdata.FFullWeight == ""){
+            layer.msg("当前异常处理只能手工调整温度，请先称重！");
+            return false;
+        }
+        
+        //console.log($(".sgtzbtn").find(".box").hasClass("active"))
+        if ($(".sgtzbtn").find(".box").hasClass("active")) {  
+            //console.log("关闭手工处理");
+            $(".sgtzbtn").find(".box").removeClass("active");
+            $("#wendu").addClass("ikd_cbTxt").attr("readonly", true);            
+            handwork = 0;
+            $("#wendu").val("");
+            $("#wendu").blur();
+
+            //允许温度提示框弹出来
+            if (TBdata.FSendFor != undefined && TBdata.FSendFor == 2) {
+                //  console.log('2222222:' + wendutype);
+                ft = 2;
+               // gengxinDB(2);
+                //汤包状态更新为过载
+
+                wendutype = 1;
+                //温度通讯打开
+                openWDsockt();
+            }
+        } else {
+            //console.log("开启手工处理");
+            $(".sgtzbtn").find(".box").addClass("active");
+            $("#wendu").removeClass("ikd_cbTxt").attr("readonly", false);     
+            handwork = 1;
+            $("#wendu").val("");
+            $("#wendu").focus();
+
+            //温度初始化
+            maxwd = 0;
+            wdnum = 0;
+            //温度弹出框初始化不允许弹出
+            wendutype = 2;
+        }
+    }
+
+    function alert2_show(ftype, ngcheck,FTBNumber) {
+        $("#qralert2").show();   
+        $("#TBnumber2").text(FTBNumber);
+        if (ftype == 1){
+            // OK
+            $("#qralert2").removeClass("qralert2_t1").addClass("qralert2_t2");
+            $("#qralert2").find(".alertT2").show();
+            $("#qralert2").find(".alertT1").hide();
+            $("#qralert2").find(".z-checklist").hide();
+            $("#qralert2Close").attr("src", "../images/close_BG1.png");             
+        } else{
+            // NG
+            $("#qralert2").removeClass("qralert2_t2").addClass("qralert2_t1");
+            $("#qralert2").find(".alertT1").show();
+            $("#qralert2").find(".alertT2").hide();
+            $("#qralert2").find(".z-checklist").show();
+            $("input[name=jytype2][value=" + ngcheck + "]").attr("checked", true);
+            $("#qralert2Close").attr("src", "../images/close_BG2.png"); 
+          }
+
+        //console.log("温度提交结束初始化");
+        //重新初始化地磅更新状态
+        fxgxdb = 0;
+        //设置地磅弹出框已打开状态来触发地磅自动检测重量为0自动关闭功能
+        ft = 2;
+    }
+    function alert2_hide() {
+        $("#qralert2").hide();
+        $('input:radio[name=jytype2]').attr('checked', false);
+    }
+   // alert2_show(2,3,3001);
+
+    //地磅更新状态标记 空载标记已处理 fxgxdb>0
+    var fxgxdb = 0;
+    //地磅更新状态标记 重量确认已处理标记 fkqdb>0
+    var fkqdb = 0;
+    //称重通讯通道初始化打开
+    function openCZsockt() {
+        //称重下线
+        //var fxx = DBoption.FNoload;
+         _v = DBoption.FNoload;         
+              
+        //1，满包，3，空包
+        if (TBdata.FSendFor == 1 || TBdata.FSendFor == 3) {
+            //ponderation=true 存在物品
+            if (ponderation && ft == 1) {
+                //称重未弹出框进行弹出框     
+                showCZ();
+            }
+        }
+    //    try {
+     //      }
+     //   catch(err){
+      //       console.log('err+'+err);
+      //  }
+
+        //更新地磅状态并清理数据
+      //  console.log('ft：' + ft);
+        if (!ponderation) {//地磅无物品
+
+            if (fxgxdb == 0) {//是否已处理过清空操作
+             //   console.log('地磅空载数据清理!');
+                fxgxdb++;
+                if (ft == 2) { //在温度温度提交后处理                       
+                     cleardata();   
+                }                                  
+                //关闭结果提示框
+                alert2_hide();
+                gengxinDB(0);
+                fkqdb = 0;   //允许 地磅更新过载状态 提示初始化 
+            } 
+
+        }else {//地磅存在东西
+            if (fkqdb == 0) {//更新地磅状态
+               // console.log('地磅过磅状态更新!');
+                fkqdb++;                   
+                gengxinDB(1);
+                fxgxdb = 0;          
+            }
+        }
+    }
+
+    var maxwd = 0;
+    var wdnum = 0;
+    //温度通讯通道初始化，打开
+    function openWDsockt() {
+        //重新激活温度监听
+        //clearTimeout(tagNum);
+       // getWDInfo();
+
+        if (DBoption.FTemperature <= _WD && DBoption.FChannel == cenoll && wendutype == 1) {
+       if (_WD > maxwd) {
+                maxwd = _WD;
+                wdnum = 0;
+            } else {
+                wdnum++;
+            } 
+
+            if (wdnum > 2) {
+                $("#max_wendu").css("color", "red");
+            } else {
+                $("#max_wendu").css("color", "#333333");
+            }
+
+            //wendutype = 1;// 温度弹框条件判断
+            showWD();
+        } else {
+           //hideWD();
+        }
+
+    }
+
+    // 显示温度框
+    function showWD() {
+        wendutype = 2;
+        $("#wdalert").show();
+        //if (wendutype == 1) {
+        //    wendutype = 2;
+        //    $("#wdalert").show();
+        //}       
+    }
+
+    // 隐藏温度框 tpy=1关闭温度通讯
+    function hideWD() {
+        $("#wdalert").hide();
+        wendutype = 2;
+    }
+
+    // 显示弹出框
+    function showCZ() {
+        ft = 2;
+        $("#zlalert").show();
+        setTimeout(function(){ 
+            $(".weightconfirm").text("确定");
+            $(".weightconfirm").attr("onclick","czqrbtn()");
+        },10000);
+        gengxinDB(1);
+    }
+
+    // 隐藏弹出框 1关闭通道  0 不做关闭
+    function hideCZ() {
+        $("#zlalert").hide(); 
+                
+        if (ponderation) {//当前存在物品           
+            //地磅状态不做更新
+            fkqdb++; //称重已打开标记
+            fxgxdb = 0;//允许关闭标记
+        } else {
+            gengxinDB(0);
+        }
+        $("#sszl").text("");
+    }
+
+    /* 提交完成 清除数据 */
+    function cleardata() {
+     //   console.log('3333');
+        ft = 1;
+        wendutype = 2;
+
+    //地磅更新状态标记 避免重复更新  打开
+        fkqdb = 0;
+
+       // $('#CZG').text("");
+       // $('#FCardNo').val("").attr("realvalue","");
+       // $('#ygname').text("");
+ 
+        TBinfo = {};//汤包信息
+        TBdata = {};//汤包数据
+        jydata = {};//检验结果
+        maxwd = 0;//最大温度
+        wdnum = 0;//温度计数器        
+        istj = 0;
+       // fxgxdb = 0;//地磅状态是否已更新 当汤包离开地磅自动对状态进行更新
+
+        $("#manbaocheck").find(".box").removeClass("active");
+        $("#kongbaocheck").find(".box").removeClass("active");
+        $("#manbaocheck1").find(".box").removeClass("active");
+        $("#kongbaocheck1").find(".box").removeClass("active");
+        $("#cewencheck1").find(".box").removeClass("active");
+
+        $("#TBCode").val("").attr("fid", "");
+        $("#TBnumber").text("");
+        $("#TBnumber2").text("");
+        $("#FBucketWeight").val("");
+        $("#FWeightSum").val("");
+        $("#FNetweight").val("");
+        $("#wendu").val("");
+        $("#max_wendu").val("");
+        $("#sszl").text("");
+        
+        $("#jieguo1").text("");
+        $("#jieguo2").text("");
+        $("#jieguo3").text("");
+        $("#jieguo4").text("");
+        //初始化单选框
+        $('input:radio[name=jytype]').attr('checked', false);
+
+        //关闭结果提示框
+        //alert2_hide();
+
+        //地磅称重通讯关闭
+         hideCZ();
+        //温度通讯关闭
+         hideWD();
+        //console.clear();
+
+        //手工处理选择项初始化
+        handwork = 0;
+        if($(".sgtzbtn").find(".box").hasClass("active")) {//关闭手工处理
+            $(".sgtzbtn").find(".box").removeClass("active");
+            $("#wendu").addClass("ikd_cbTxt").attr("readonly", true);   
+        }
+    }
+
+    /* 打印 检验标签 */
+    function xiaoyangPrint() {        
+            // $.jwPrintList({
+            //     Ftype: 'fanchangTM',//打印格式名称
+            //     //true：直接打印，false：预览
+            //     isprint: false,
+            //     //打印机名称（不填则使用默认打印机）
+            //     printName: 'Gprinter GP-3120TU',
+            //     /*
+            //    打印方向及纸张类型，数字型，
+            //    1---纵(正)向打印，固定纸张；
+            //
+            //    2---横向打印，固定纸张；
+            //    3---纵(正)向打印，宽度固定，高度按打印内容的高度自适应；
+            //    0(或其它)----打印方向由操作者自行选择或按打印机缺省设置；
+            //    */
+            //     intOrient: "1",
+            //     ArrayMed: [{
+            //         "FCodeindx": "306-2019110501-16",
+            //         "FCode": "3006",
+            //         "FTBNumber": "3005",
+            //         "FDate": "2019-11-08T18:57:22.02",
+            //         "serialSN": "{\"q\":\"CTPC\",\"n\":\"306-2019110501-16\"}"
+            //     }]
+            //
+            // });
+            //
+            // return false;
+
+            com.submit('api40385', {
+                FSoupCZID: TBdata.FSoupCZID,
+                FType: 0, // 打印类型，0确定，1补打
+            }, function (data) {
+                if (data.ds[0].status == "000000") {
+                    //alert("aaaaa");
+
+                    var serialSN = {
+                        q: "CTPC",
+                        n: TBdata.FCodeindx
+                    }
+
+                    $.jwPrintList({
+                        Ftype: 'fanchangTM',//打印格式名称
+                        //true：直接打印，false：预览
+                        isprint: true,
+                        //打印机名称（不填则使用默认打印机）
+                        printName: 'Gprinter GP-3120TU',
+                        /*
+                       打印方向及纸张类型，数字型，
+                       1---纵(正)向打印，固定纸张；
+
+                       2---横向打印，固定纸张；
+                       3---纵(正)向打印，宽度固定，高度按打印内容的高度自适应；
+                       0(或其它)----打印方向由操作者自行选择或按打印机缺省设置；
+                       */
+                        intOrient: "1",
+			intPageWidth: "400",
+              		intPageHeight: "300",
+                        printcount: 2, // 打印几份
+                        ArrayMed: [{
+                            FCodeindx: TBdata.FCodeindx,
+                            FCode: TBdata.FCode,
+                            FTBNumber: $("#TBCode").val(),
+                            FDate: TBdata.FDate,
+                            serialSN: JSON.stringify(serialSN)
+                        }]
+                    });
+                    //  ArrayMed:[{orderNo:'S190911002',productModel:'1021000067',lifeTimer:'7.5',description:'故障现象777777777771',serialSN:'00000000000'},{orderNo:'S190911002',productModel:'1021000068',lifeTimer:'8.5',description:'故障现象888871',serialSN:'99990000000'}]})
+                }
+             });
+       
+            setTimeout(function () { //打印完毕后进行模拟扫码动作
+                //重量通讯关闭
+              //  hideCZ();
+               // hideWD();
+                tBsaomiao(TBinfo.FTBNumber);                
+            }, 300);
+    }
+
+    //手工输入温度
+    function setWendu() {
+        //首先判断手工操作是否开启
+        if ($(".sgtzbtn").find(".box").hasClass("active")) {
+            //设置最大温度
+            maxwd = $("#wendu").val();
+            var ival = parseInt(maxwd);//如果变量val是字符类型的数则转换为int类型 如果不是则ival为NaN
+	        if(!isNaN(ival)){
+		        wdqrbtn();
+            } else {
+                layer.msg("请输入正确的温度数据！");
+                return false;
+	        }         
+        } else {
+            layer.msg("请选择【手工操作】输入温度后再提交！");
+            return false;
+        }       
+    }
+
+    // 温度确认
+    function wdqrbtn() {
+        if (DBoption.FTruckscalesID == undefined || DBoption.FTruckscalesID == '') {
+            layer.msg('请扫描地磅信息！');
+            return false;
+        }        
+        if ($("#TBnumber").text() == undefined || $("#TBnumber").text() == "") {
+            layer.msg("请扫描汤包二维码");
+            return false;
+        }
+        if ($('#factory').attr('fid') == undefined ||  $('#factory').attr('fid') == "") {
+            layer.msg("请选择工厂");
+            return false;
+        }
+        if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined){
+            layer.msg("请扫描员工信息！");
+            return false;
+        }
+        if (TBdata.FSoupCZID == undefined || TBdata.FSoupCZID == ""){
+            layer.msg("当前汤包未找到出汤记录，请核实情况");
+            return false;
+        }
+        
+        com.submit('api40930', {
+            FSoupCZID: TBdata.FSoupCZID,
+            FCompanyID: $('#factory').attr('fid'),
+            FWDCheck: maxwd
+        }, function (data) {
+            if (data.ds[0].status == "000000") {
+                jydata = data.ds1[0];
+                /*
+                FQCEmplID,       --检验员ID
+                FMDCheckValue,   --密度检验值
+                FMDCheckResult,  --密度检验结果；0--不合格；1--合格
+                FKModalCheckResult, --K模检验结果 0不合格 1合格
+                @FWDCheckResult  bit    --温度检验结果；0--不合格；1--合格
+                FCheckResult bit       --总体检验结果；0--不合格；1--合格
+                */
+                hideWD();
+                showQR();
+                $("#wendu").val(maxwd);
+                maxwd = 0;
+                wdnum = 0;
+            } else {
+                layer.msg(data.ds[0].msg);
+            }
+        });                    
+    }
+
+    // 显示确认框
+    function showQR () {
+        $("#jieguo1").text(jydata.FMDCheckResultMSG);
+        $("#jieguo2").text(jydata.FKModalCheckResultMSG);
+        $("#jieguo3").text(jydata.FWDCheckResultMSG);
+        $("#jieguo4").text(jydata.FCheckResultMSG);
+        $("#qralert").show();        
+
+        if (jydata.FCheckResult == 0) //不合格  处理方式可编辑
+        {
+           // layer.msg('不合格')
+            $("input[name='jytype']").each(function () {
+                $(this).attr("disabled", false);
+            });
+        } else {
+            //layer.msg('合格')
+            $("input[name='jytype']").each(function () {
+                $(this).attr("disabled", true);
+            });
+        }        
+    }
+
+    // 隐藏确认框
+    function hideQR () {
+        $("#jieguo1").text("");
+        $("#jieguo2").text("");
+        $("#jieguo3").text("");
+        $("#jieguo4").text("");
+        $("#qralert").hide();
+    }
+
+    // 确认框 提交
+    function tjqrbtn() {
+       // layer.msg("tijiao！" + $("input[name='jytype']:checked").val());
+       // layer.msg("tijiao！" + jydata.FCheckResult );
+        //合格直接提交
+        if (jydata.FCheckResult != undefined && jydata.FCheckResult != null && jydata.FCheckResult == 1) {
+            jydata.jytype = 0;//不做任何处理
+            hideQR();
+            Confirm();
+        } else {
+            var jytype = $("input[name='jytype']:checked").val();
+            if (jytype == undefined || jytype == null || jytype == "") {
+                layer.msg("当前检验结果为NG请选择处理方式！");
+            } else {
+                jydata.jytype = jytype;
+                hideQR();
+                Confirm();
+            }
+           /** if (jytype == 1) {//保温加温
+                layer.msg("保温加温！");
+            } else if (jytype == 2) {//除气除渣
+                layer.msg("除气除渣！");
+            } else if (jytype == 3) {//直接报废
+                layer.msg("直接报废");
+            }
+            **/
+        }
+    }
+
+    
+
+    /* 获取总重量 */
+    function getzzl() {
+        if (TBdata.FSendFor != undefined && (TBdata.FSendFor == 1 || TBdata.FSendFor == 3)) {
+            ft = 1;
+            $("#zlalert").show();
+            //地磅称重通讯打开
+            openCZsockt();
+        } else {
+            layer.msg("当前汤包状态不允许称重！");
+        }
+        
+    }
+
+    // 弹出框确认
+    function czqrbtn() {
+        console.log(1)
+        if (DBoption.FTruckscalesID == undefined || DBoption.FTruckscalesID == '') {
+            layer.msg('请扫描地磅信息！');
+            return false;
+        }        
+        if ($("#TBnumber").text() == undefined || $("#TBnumber").text() == "") {
+            layer.msg("请扫描汤包二维码");
+            return false;
+        }
+        if ($('#factory').attr('fid') == undefined ||  $('#factory').attr('fid') == "") {
+            layer.msg("请选择工厂");
+            return false;
+        }
+        if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined){
+            layer.msg("请扫描员工信息！");
+            return false;
+        }
+        if (TBdata.FSoupCZID == undefined || TBdata.FSoupCZID == ""){
+            layer.msg("当前汤包未找到出汤记录，请核实情况");
+            return false;
+        }
+
+        var zl = $("#sszl").text();
+        if (TBinfo.FStatus == 1){
+            $("#FBucketWeight").val(zl);
+            
+        } else if (TBinfo.FStatus == 2) {
+            $("#FWeightSum").val(zl);
+        }
+        if ($("#FBucketWeight").val() != "" && $("#FWeightSum").val() != "") {
+            var t1 = $("#FBucketWeight").val();
+            var t2 = $("#FWeightSum").val();
+            var t3 = parseFloat(t1) - parseFloat(t2);
+            if (t3 < 0) { t3 = 0;}
+            $("#FNetweight").val(t3);
+        }
+
+        zlqr(zl);
+    }
+
+    /* 重量确认 */
+    function zlqr(FWeight){
+
+        com.submit('称重结果确认',{
+            FStatus:  TBinfo.FStatus/*汤包状态；0：闲置；1：满包；2：空包(Int)*/,
+            FCompanyID:  $('#factory').attr('fid')/*地磅所在工厂ID(Int)*/,
+            FEmplID:  $('#FCardNo').attr("realvalue")/*员工ID(Int)*/,
+            FWeight: FWeight /*$("#FBucketWeight").val()地磅显示重量(Decimal)*/,
+            FSoupCZID:  TBdata.FSoupCZID/*铝液出汤批次称重ID 主键(Int)*/,
+            FTruckscalesName:  DBoption.FTruckscalesName/*地磅别名(VarChar)*/,
+            FTruckscalesID:  DBoption.FTruckscalesID/*地磅ID(Int)*/,
+            FQRCodeRLID:  TBinfo.FQRCodeRLID/*汤包ID(VarChar)*/,
+            FNetWeight:  $("#FNetweight").val()/*净重(VarChar)*/,
+            FCodeindx:  TBdata.FCodeindx/*出汤批次码*/,
+            FTBNumber: $('#TBCode').val()/*汤包编号(VarChar)*/
+        },function (data) {
+            if (data.ds[0].status == "000000"){
+                
+                if (TBdata.FSendFor == 1) {//满包称重
+                    layer.msg("重量确认完毕");
+                    setTimeout(function () { //打印完毕后进行模拟扫码动作
+                        //重量通讯关闭
+                        //  hideCZ();
+                        // hideWD();
+                        tBsaomiao(TBinfo.FTBNumber);
+                    }, 300);
+                    //xiaoyangPrint();                    
+                } else { //空包称重成功后刷新页面
+                    location.reload();
+                }              
+                
+            } else {
+                layer.msg(data.ds[0].msg);
+            }
+        })
+    }
+
+    $(function () {
+     //    console.log("初始化:");
+      //  scan();  //扫描初始化
+        com.usb.init();
+        // getGCList();
+        getdblist();
+        // getDefaultGC();
+        //biaoding();
+        try {
+            var _FEmplID = localStorage.getItem('FEmplID');
+            var _FEmplname = localStorage.getItem('FEmplname');
+            var _FCardCode = localStorage.getItem('FCardCode');
+            $('#CZG').text(_FEmplname);
+            $('#FCardNo').val(_FEmplname).attr("realvalue", _FEmplID);
+            $('#ygname').text(_FEmplname);
+        } catch (e) { }
+    });
+
+    function outlogin() {
+        //$.get("?cmd=9999", function () {
+       //     window.location = "/pc/aspx/login.aspx";
+        //});
+    }
+
+
+
+    /* 获取地磅明细 */
+    function getdblist() {
+     //   console.log('加载地磅信息2');
+        var dbdata = localStorage.dbdata;
+        if (dbdata != undefined && dbdata != null && dbdata != "") {
+            try {
+                dbdata = JSON.parse(dbdata);
+            }catch (e) { }
+
+            $('#DBlist').val(dbdata.FTruckscalesName).attr('fid',dbdata.FTruckscalesID);
+            $('#factory').val(dbdata.FCompanyName).attr('fid', dbdata.FCompanyID);
+
+            DBoption = dbdata;
+        }
+
+        // 获取地磅明细 api40792
+        com.submit('api40792',{
+            FTruckscalesID: "" , // 地磅ID
+            FCompanyID:cid,
+        },function (data) {
+            if (data.ds[0].status == "000000"){
+
+                if (data.ds1 != undefined && data.ds1.length > 0){
+                    var html = '';
+                    data.ds1.forEach(function (value) {
+                        html += '<li fid="' + value.FTruckscalesID + '" cpid="' + value.FTruckscalesID +'" data-item="'+escape(JSON.stringify(value))+'">'+ value.FTruckscalesName +'</li>'
+                    });
+                    $('#DBlist').parent('div').next().html(html);
+                    //触发下拉事件
+                    $("#dibnan123").click();
+                }
+            }
+        })
+    }
+
+    /* 选择地磅 */
+    function getdbdata(data) {
+        DBoption = data;
+
+        $('#factory').val(DBoption.FCompanyName).attr('fid',DBoption.FCompanyID);
+
+        /* 保存本地数据 */
+        localStorage.setItem("dbdata", JSON.stringify(data));
+
+        // 获取地磅明细 api40792
+        // com.submit('api40792',{
+        //     FTruckscalesID: db , // 地磅ID
+        // },function (data) {
+        //     if (data.ds[0].status == "000000"){
+        //         DBoption = data.ds1[0];
+        //     }
+        // })
+    }
+
+    /* 更新地磅 0 空载 ；1确认 ；2  过磅 */
+    function gengxinDB(ftype) {
+     //   var FCompanyID = "";
+      //  if ($('#factory').attr('fid') != undefined ||  $('#factory').attr('fid') != ""){
+      //      FCompanyID = $('#factory').attr('fid');
+      //  }
+        console.log("更新地磅！"+ftype);
+        // api40793
+        com.submit('api40793',{
+            FTruckscalesID: DBoption.FTruckscalesID,
+            FStatus: ftype
+        },function (data) {
+            if (data.ds[0].status == "999999"){
+                layer.msg(data.ds[0].msg);
+            }
+        })
+    }
+    
+    function tBsaomiao(code) {
+        //原来接口名称'api40661'
+        com.submit("汤包扫描查状态", {
+            FTBNumber: code,
+            FTruckscalesID: DBoption.FTruckscalesID,
+        }, function (data) {
+            if (data.ds[0].status == "000000") {
+                //初始化页面所有数据
+                cleardata();
+                
+                // 汤包状态
+                TBinfo = data.ds1[0];
+                $('#TBCode').val(data.ds1[0].FTBNumber).attr("fid",data.ds1[0].FQRCodeRLID);
+                $('#TBnumber').text(data.ds1[0].FTBNumber);
+
+                if (TBinfo.FStatus == 0){
+                    // 闲置  cewencheck1
+                    $("#manbaocheck").find(".box").removeClass("active");
+                    $("#kongbaocheck").find(".box").removeClass("active");
+                    $("#manbaocheck1").find(".box").removeClass("active");
+                    $("#kongbaocheck1").find(".box").removeClass("active");
+                    $("#cewencheck1").find(".box").removeClass("active");
+                }
+                if (TBinfo.FStatus == 1){
+                    // 满包
+                    $("#manbaocheck").find(".box").addClass("active");
+                    $("#kongbaocheck").find(".box").removeClass("active");
+                    $("#manbaocheck1").find(".box").addClass("active");
+                    $("#kongbaocheck1").find(".box").removeClass("active");
+                    $("#cewencheck1").find(".box").removeClass("active");
+                }
+                if (TBinfo.FStatus == 2){
+                    // 空包
+                    $("#manbaocheck").find(".box").removeClass("active");
+                    $("#kongbaocheck").find(".box").addClass("active");
+                    $("#manbaocheck1").find(".box").removeClass("active");
+                    $("#kongbaocheck1").find(".box").addClass("active");
+                    $("#cewencheck1").find(".box").removeClass("active");
+                }
+
+                var FCompanyID = "";
+                if ($('#factory').attr('fid') != undefined ||  $('#factory').attr('fid') != ""){
+                    FCompanyID = $('#factory').attr('fid');
+                }
+
+                com.submit('api40246', {
+                    FTBNumber: code,
+                    FCompanyID: FCompanyID,
+                    FStatus: TBinfo.FStatus,
+                    FEnable: TBinfo.FEnable
+                }, function (data) {
+                    if (data.ds[0].status == "000000") {
+                        maxwd = 0;
+                        wdnum = 0;
+
+                        TBdata = data.ds1[0];
+                        $("#sszl").text("");
+                        $("#FBucketWeight").val(TBdata.FFullWeight);
+                        $("#wendu").val(TBdata.FWDCheck);
+
+                       //console.log(TBdata);
+                       //当满包或者空包称重时才启用地磅通讯
+                       if (TBdata.FSendFor != undefined && (TBdata.FSendFor == 1 || TBdata.FSendFor == 3)) {         
+                            // console.log('111111111');
+                            //地磅状态初始化标记 当汤包离开地磅自动更新状态
+                            ponderation = false;
+                            zeroindex = 0;
+                            zeroArr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                            fxgxdb = 0;
+                            //地磅称重通讯打开
+                            openCZsockt();
+                        } else if (TBdata.FSendFor != undefined && TBdata.FSendFor == 2) {
+                         //  console.log('2222222:' + wendutype);
+                            ft = 2;
+                            gengxinDB(2);
+                            //汤包状态更新为过载
+
+                            wendutype = 1;
+                            //温度通讯打开
+                           openWDsockt();
+ 			  //  clearTimeout(tagNum);
+      		 //	   getWDInfo();
+
+
+                          // console.log('3333:' + wendutype);
+
+                           $("#manbaocheck").find(".box").removeClass("active");
+                           $("#kongbaocheck").find(".box").removeClass("active");
+                           $("#manbaocheck1").find(".box").removeClass("active");
+                           $("#kongbaocheck1").find(".box").removeClass("active");
+                           $("#cewencheck1").find(".box").addClass("active");
+                        }                        
+                    } else {
+                        layer.msg(data.ds[0].msg);
+
+                        //页面信息清理
+                        TBinfo = {};
+                        $('#TBCode').val("").attr("fid","");
+                        $('#TBnumber').text("");
+
+                        $("#manbaocheck").find(".box").removeClass("active");
+                        $("#kongbaocheck").find(".box").removeClass("active");
+                        $("#manbaocheck1").find(".box").removeClass("active");
+                        $("#kongbaocheck1").find(".box").removeClass("active");
+                        $("#cewencheck1").find(".box").removeClass("active");
+                     //   cleardata();//初始化页面所有数据
+                    }
+                });
+            } else {
+                //其他状态判断处理
+                layer.msg(data.ds[0].msg);
+                cleardata();//初始化页面所有数据
+            }
+        });
+    }
+
+    // 获取 api40661 汤包状态 汤包id 
+    var TBinfo = {};
+    var TBdata = {};
+     //扫描
+    //function scan() {
+    //   // com.usb.init(scandata);  
+    //  com.usb.init();
+    //}
+    //扫描监听方法
+    function  scandata(code) {
+            if (/^{/.test(code)) {
+                var obj = eval('(' + code + ')');
+                if (obj.q.toUpperCase() == 'ZYB') {
+                    //根节点 > PDA程序 > 汤包称重检验 > 汤包称重 > 汤包编号扫描api40246
+                    //{"q":"ZYB","n":"3001","k":"ZYB3001"}
+                                 
+                    if ($('#factory').attr('fid') == undefined || $('#factory').attr('fid') == "") {
+                        layer.msg("请选择工厂！");
+                        return false;
+                    } else if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined) {
+                        layer.msg("请扫描员工信息！");
+                        return false;
+                    } else {
+                        tBsaomiao(obj.n);
+                    }                   
+        
+                } else if (obj.q.toUpperCase() == 'DB') {
+                    //地磅扫描逻辑
+                    //{"q":"DB","n":"1"}
+
+                    //选中地磅下拉项
+                    $("#dibanlists li").each(function () {
+                        try {
+                            //是否当前地磅
+                            if (obj.n == $(this).attr('fid')) {
+                                //设置选中信息
+                                $('#DBlist').val($(this).text()).attr('fid', $(this).attr('fid'));
+                                //隐藏下拉选项
+                                $("#dibanlists").hide();
+                                //获取当前地磅的数据组
+                                var item = unescape($(this).data("item"));
+                                //转换成json对象
+                                item = JSON.parse(item);
+                                //选中
+                                getdbdata(item);
+                            }
+                        } catch (e) {}
+                    })
+                }else {
+                    layer.msg("汤包二维码格式【"+code+"】存在问题无法解析！");
+                }
+            }else {
+                //扫描员工卡api40248
+                // 员工二维码  200522  100767 100013
+                com.submit('api40248',{
+                    FCardCode: code
+                },function (data) {
+                   // console.log(data);
+                    try {
+                        if (data.ds[0].status  === '000000'){
+                            localStorage.setItem('FEmplID', data.ds1[0].FEmplID);
+                            localStorage.setItem('FEmplname', data.ds1[0].FEmplname);
+                            localStorage.setItem('FCardCode', data.ds1[0].FCardCode);
+                            $('#CZG').text(data.ds1[0].FEmplname);
+                            $('#FCardNo').val(data.ds1[0].FEmplname).attr("realvalue",data.ds1[0].FEmplID);
+                            $('#ygname').text(data.ds1[0].FEmplname);
+                            layer.msg(data.ds[0].msg);
+                        } else {
+                            layer.msg(data.ds[0].msg)
+                        }
+                    }catch (e) {
+                        console.error(e)
+                    }
+                })
+            }
+        }
+   
+
+    function selectDB(dom,e) {
+        e = e || window.event;
+        e.stopPropagation();
+        var ul = $(dom).next();
+        ul.toggle();
+        ul.find('li').click(function () {
+            $('#DBlist').val($(this).text()).attr('fid',$(this).attr('fid'));
+            ul.hide();
+
+            var item = unescape($(this).data("item"));
+            item = JSON.parse(item);
+            getdbdata(item);
+        });
+        $(document).on('click',function () {
+            ul.hide();
+        })
+    }
+    
+    //历史记录
+    function history() {
+
+        if (DBoption.FTruckscalesID == undefined || DBoption.FTruckscalesID == '') {
+            layer.msg('当前无地磅信息<br/>请选择地磅信息才可以查看历史记录！')
+        } else {
+             location.href = 'history.html?a=44&FTruckscalesID=' + DBoption.FTruckscalesID + '&FEmplID=' 
+             + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'));
+        
+            /*layer.open({
+                type: 2,
+                title: false,
+                closeBtn: false,
+                area: ['100%', '100%'],
+                content: 'history.html?a=32&FTruckscalesID=' + DBoption.FTruckscalesID + '&FEmplID=' 
+                + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'))
+            }); */
+        }
+    }
+
+    /* 是否已提交 */
+    var istj = 0;
+    //确定
+    function Confirm() {
+        // 汤包称重确定api40247
+        var zl = $("#sszl").text();
+        
+        com.submit('api40247',{
+            FCompanyID:  $('#factory').attr('fid')/*地磅所在工厂ID(Int)*/,
+            FEmplID:  $('#FCardNo').attr("realvalue")/*员工ID(Int)*/,
+            FWeight: zl/*地磅显示重量(Decimal)*/,
+            FSoupCZID:  TBdata.FSoupCZID/*铝液出汤批次称重ID 主键(Int)*/,
+            FTruckscalesName:  DBoption.FTruckscalesName/*地磅别名(VarChar)*/,
+            FTruckscalesID: DBoption.FTruckscalesID/*地磅ID(Int)*/,
+            FWDCheck: jydata.FWDCheck/*温度值(Decimal)*/,
+            FWDCheckResult: jydata.FWDCheckResult/*温度判定结果(int)*/,
+            FCheckResult: jydata.FCheckResult/*总结果(int)*/,
+            FQRCodeRLID:  $('#TBCode').attr("fid")/*汤包ID(VarChar)*/,
+            FNetWeight:  $("#FNetweight").val(),/*净重(VarChar)*/
+            FTBNumber:  $('#TBCode').val()/*汤包编号(VarChar)*/,
+            FCodeindx:  TBdata.FCodeindx/*出汤批次码(VarChar)*/,
+            FJytype: jydata.jytype/**检验结果处理方式 **/,
+            FWDhandwork:handwork/**是否手工提交温度 0否 1是 **/
+        },function (data) {
+            if (data.ds[0].status == "000000"){
+                layer.msg(data.ds[0].msg);    
+
+                var FCheckResult = jydata.FCheckResult;
+                var jytype = jydata.jytype;
+                var FTBNumber=TBinfo.FTBNumber;//汤包编号
+                //清除数据
+                cleardata();
+                //判定结果提示框
+                alert2_show(FCheckResult,jytype,FTBNumber);
+
+            } else {
+                layer.msg(data.ds[0].msg)
+            }
+        })
+    }
+
+    function closeFrame() {
+        layer.closeAll();
+    }
+
+    function changeStatus(_this){
+        $(".chazhi>button").css({"background":"#bd1738","color":"white"})
+        $(".chazhi>button").attr("tag",0)
+        $(_this).css({"background":"white","color":"black"}) 
+        $(_this).attr("tag",1);
+        var weight = $(".sizeInput>input[name=sizeweight]").val();
+        if(weight){
+            var result = $(_this).text();
+            var jieguo = Math.abs(weight - result * 1000);
+            $("input[name=sizesum]").val(jieguo)
+        }
+    }
+
+
+</script>
+</html>
+<script type="text/html" class="weight" beizhu="模板">
+    <div style="width:80%;margin:0 auto;margin-top:4%">
+        <div style="width:100%;height:30px;"> 
+            <div style="color:white;font-size:20px;float:left">地磅重量标定</div>
+            <div style="float:left;margin-left:300px;color:white;font-size:24px" class="chazhi">
+                <button type="button" style="width:70px;height:30px;background:#bd1738;border:none;color:white;font-size:20px" onclick="changeStatus(this)" tag="0">1</button>
+                <button type="button" style="width:70px;height:30px;background:#bd1738;border:none;color:white;font-size:20px" onclick="changeStatus(this)" tag="0">2</button>&nbsp;吨
+            </div>
+        </div>
+        <div class="sizeBox">
+            <div class="sizeName">地磅名称</div>
+            <div class="sizeInput"><input type="text" name="sizedb" /></div>
+        </div>
+        <div class="sizeBox">
+            <div class="sizeName">重量</div>
+            <div class="sizeInput"><input type="text" name="sizeweight"  /></div>
+        </div>
+        <div class="sizeBox">
+            <div class="sizeName">差值</div>
+            <div class="sizeInput"><input type="text" name="sizesum" /></div>
+        </div>
+    </div>
+</script>

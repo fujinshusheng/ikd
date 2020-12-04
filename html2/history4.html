@@ -1,0 +1,191 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>回料称重记录列表</title>
+    <link rel="stylesheet" href="../css/pagination.css">
+    <link rel="stylesheet" href="../js/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="../css/base.css" media="screen">
+    <script type="text/javascript" src="../js/jquery-1.8.2.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/pagination.min.js"></script>  
+    <style>
+        .cib {
+            padding: 5px 2px;
+        }
+
+        .cib input {
+            vertical-align: bottom;
+            height: 20px;
+            color: #567e84;
+            margin: 2px 0px;
+        }
+
+        .cib button {
+            vertical-align: bottom;
+            height: 26px;
+            cursor: pointer;
+            background-color: #cbefff;
+            border: 1px solid #44a8d6;
+            color: #567e84;
+            margin: 2px 0px;
+        }
+
+        .desc {
+            padding-left: 2px;
+            color: #657e9a;
+        }
+
+        .desc-red {
+            padding-left: 2px;
+            color: red;
+        }
+
+        .code-con{
+            font-size: 18px;
+        }
+
+        .hr-c{
+            background-color: #2196F3;
+            height: 5px;
+            border: 0px;
+        }
+    </style>
+</head>
+<body style="background-image: url(../images/bg2.jpg);">
+<!--头部 begin-->
+<div class="ikd_head">
+    <img src="../images/logo.gif" class="ikd_hdImg">
+    <span class="ikd_hdTit">原材料追溯系统</span>
+    <span class="ikd_hdTit1">极望J9产品追溯系统</span>
+
+
+    <div class="ikd_hdCls">
+        <button class="ikd_hdCls1">_</button>
+        <button class="ikd_hdCls2"></button>
+    </div>
+
+    <div class="ikd_hdBtu">
+        <span class="ikd_hdBtu1">操作工：<i id="CZG"></i></span>
+        <!-- <button class="ikd_hdBtu3" onclick="parent.closeFrame()">退出登录</button>
+    <button class="ikd_hdBtu3" onclick="parent.closeFrame()">返回主页</button> -->
+
+    </div>
+</div>
+<!--头部 end-->
+<!--内容 begin-->
+<div class="ikd_con pr">
+    <p class="ikd_cTit">
+        <i></i>回料称重记录 <a class="ikd_cRtrn" onclick="history.back()">返回上一页</a></p>
+    <div style="overflow:auto; height: 570px;">
+        <table class="ikd_cB ikd_cB2" border="0">
+            <thead>
+            <tr>
+                <td><label class="ikd_cbTit3">日期</label></td>                
+                <td><label class="ikd_cbTit3">桶二维码</label></td>
+                <td><label class="ikd_cbTit3">桶重</label></td>
+                <td><label class="ikd_cbTit3">总重量</label></td>
+                <td><label class="ikd_cbTit3">净重</label></td>
+                <td><label class="ikd_cbTit3">材料牌号</label></td>
+      
+            </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+    <div class="clear">
+    </div>
+    <!--页码 begin-->
+    <div id="divPage"></div>
+    <!--页码 end-->
+</div>
+<!--内容 end-->
+<script type="text/html" id="dataRowHtml">
+    <tr>
+        <td><div class="ikd_cbConl">{日期}</div></td>        
+        <td><div class="ikd_cbConl">{桶二维码}</div></td>
+        <td><div class="ikd_cbConl">{桶重}</div></td>
+        <td><div class="ikd_cbConl">{总重量}</div></td>
+        <td><div class="ikd_cbConl">{净重}</div></td>
+        <td><div class="ikd_cbConl">{材料牌号}</div></td>
+
+    </tr>
+</script>
+<script type="text/javascript">
+    // 获取地址栏参数
+    function getUrlname(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+    var FEmplID = getUrlname("FEmplID");
+    var FEmplname = unescape(getUrlname("FEmplname"));
+    var FCompanyID = getUrlname("FCompanyID");
+    $(function () {
+        getList();
+        $('#CZG').text(FEmplname);
+    });
+    
+    //页码
+    var pageIndex_ = 1;
+    var pageSize_=10;
+    function getList() {
+        com.submit('回料称重历史记录', {
+            FCompanyID:FCompanyID,
+            FEmplID:FEmplID,
+            PageIndex:pageIndex_,
+            PageSize:pageSize_
+        },function (data) {
+            try {
+                var model = $('#dataRowHtml').html(),html = '';
+                data.ds1.forEach(function (value) {
+                    html += model
+                        .replace(/{日期}/g, '' + value.FDate)
+                        .replace(/{材料牌号}/g, '' + value.FCLPHMain)
+                        .replace(/{桶二维码}/g, '' + value.FName)
+                        .replace(/{桶重}/g, '' + value.FBWeight)
+                        .replace(/{总重量}/g, '' + value.FWeightSum)
+                        .replace(/{净重}/g, '' + value.FNetweight)
+                });                
+                $('#tbody').html(html);
+
+                //页码信息加载
+                $("#divPage").whjPaging({
+                    css: 'css-2',
+                    // currPage:pageIndex_,
+                    // totalSize: data.ds[0].Pcount,//总记录数
+                    // totalPage: data.ds[0].PcountPages, //总页码数                        
+                    isShowSkip: false,
+                    pageSizeOpt: [
+                        {value: 10, text: '10条/页', selected: true},
+                        {value: 20, text: '20条/页'},
+                        {value: 40, text: '40条/页'},
+                        {value: 80, text: '80条/页'}
+                    ],
+                    // isShowTotalSize: false,
+                    // isShowTotalPage: false,
+                    // isShowRefresh: false,
+                    // isShowPageSizeOpt: false,
+                    // isShowFL: false,
+                    callBack: function (currPage, pageSize) {
+
+                        // console.log('currPage:' + currPage + '     pageSize:' + pageSize);
+                        pageIndex_=currPage;
+                        pageSize_=pageSize;
+                        getList() ;
+
+                    }
+                });
+                //setPage方法
+                $("#divPage").whjPaging("setPage", {currPage: pageIndex_, totalPage: data.ds[0].PcountPages, totalSize: data.ds[0].Pcount});
+            }catch (e) {
+                console.error(e)
+            }
+        });
+    }
+  
+</script>
+</body>
+</html>

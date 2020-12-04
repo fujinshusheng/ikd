@@ -1,0 +1,542 @@
+﻿@charset "UTF-8";
+html {
+    -ms-touch-action: pan-y;
+    touch-action: pan-y; }
+body {
+    font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    width: 100%;
+}
+ul, li, dl, dt, dd, h1, h2, h3, h4, h5, h6, a, i, em, select, p,img {
+    margin: 0;
+    padding: 0;
+}
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+ul, li {
+    list-style: none;
+}
+a {
+    text-decoration: none;
+    font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+i, em {
+    font-style: normal;
+}
+
+/*滚动条优化*/
+::-webkit-scrollbar {
+  width: 0px;
+  height: 14px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 5px solid transparent;
+}
+::-webkit-scrollbar-track {
+  box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+}
+::-webkit-scrollbar-thumb {
+  min-height: 20px;
+  background-clip: content-box;
+  box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+input, img, select {
+    border: 0;
+    outline: 0;
+}
+input[type="button"], input[type="submit"], input[type="reset"], input[type="text"], select, textarea {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}/* 去掉iphone输入框、按钮、选择框等自带样式 */
+/*全局placeholder颜色*/
+::-webkit-input-placeholder {
+    color:#999;
+    font-size:14px;
+}/* WebKit browsers */
+:-moz-placeholder {
+    color:#999;
+    font-size:14px;
+}/* Mozilla Firefox 4 to 18 */
+::-moz-placeholder {
+    color:#999;
+    font-size:14px;
+}/* Mozilla Firefox 19+ */
+:-ms-input-placeholder {
+    color:#999;
+    font-size:14px;
+}/* Internet Explorer 10+ */
+
+*,*:before,*:after{
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+h1{
+    font-size: 32px;
+    font-weight: 600;
+}
+h2{
+    font-size: 28px;
+    font-weight: 600;
+}
+h3{
+    font-size: 24px;
+    font-weight: 600;
+}
+h4{
+    font-size: 20px;
+    font-weight: 600;
+}
+h5{
+    font-size: 18px;
+    font-weight: 600;
+}
+h6{
+    font-size: 16px;
+    font-weight: 600;
+}
+input[type="checkbox"] {
+    vertical-align: middle;
+}
+textarea {
+    overflow-y: auto;
+    padding: 3px
+}
+a {
+    color: #428bca;
+    text-decoration: none;
+    outline: 0;
+    font-family: "微软雅黑", Arial, Helvetica, sans-serif;
+}
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+a:hover, a:active {
+    /*color: #2a6496;*/
+    text-decoration: none;
+}
+a:focus {
+    outline: 0;
+}
+hr{
+    border-top: solid 1px #e2e0e0;
+    border-bottom: none;
+    margin: 15px auto;
+}
+button::-moz-focus-inner {
+    border:0;
+    padding:0;
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+    display: block
+}
+.fl {
+    float: left
+}
+.fr {
+    float: right
+}
+.tl {
+    text-align: left;
+}
+.tc {
+    text-align: center;
+}
+.tr {
+    text-align: right;
+}
+.fz12{
+    font-size: 12px;
+}
+.fz14{
+    font-size: 14px;
+}
+.fz16{
+    font-size: 16px;
+}
+.fz18{
+    font-size: 18px;
+}
+.fz20{
+    font-size: 20px;
+}
+.fz24{
+    font-size: 24px;
+}
+.fz28{
+    font-size: 28px;
+}
+.fz32{
+    font-size: 32px;
+}
+.grayc {
+    color: #ccc
+}
+.gray01{
+    color: #1f2228;
+}
+.gray02{
+    color: #a3a3a3;
+}
+.gray3 {
+    color: #333
+}
+.gray6 {
+    color: #666
+}
+.gray9,
+.gray9:hover {
+    color: #999
+}
+.emstyle {
+    font-style: italic
+}
+.clear {
+    clear: both
+}
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.clearfix {
+    *height:1%;
+}
+.none {
+    display: none
+}
+.minheight500 {
+    min-height: 500px;
+    height: auto !important;
+    height: 500px;
+    overflow: visible;
+}
+textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+    background-color: #ffffff;
+    border: 1px solid #eae9e9;
+}
+textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus, .uneditable-input:focus {
+    border-color: rgba(82,168,236,0.8);
+    outline: 0;
+    outline: thin dotted \9;/* IE6-9 */
+}
+
+
+/**
+ * Grid
+ * --------------------------------------------------
+ * Using flexbox for the grid, inspired by Philip Walton:
+ * http://philipwalton.github.io/solved-by-flexbox/demos/grids/
+ * By default each .z-col within a .z-row will evenly take up
+ * available width, and the height of each .z-col with take
+ * up the height of the tallest .z-col in the same .z-row.
+ */
+.z-row.z-col,
+.z-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+}
+.z-row-wrap {
+    -webkit-flex-wrap: wrap;
+    -moz-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+.z-col {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -moz-box-flex: 1;
+    -moz-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    display: block;
+    width: 100%;
+    font-family: "Microsoft YaHei", "微软雅黑", Helvetica, "黑体", Arial, Tahoma;
+}
+/* Vertically Align.z-columns */
+/* .z-row-* vertically aligns every .z-col in the .z-row */
+.z-row-top {
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    align-items: flex-start;
+}
+.z-row-bottom {
+    -webkit-box-align: end;
+    -ms-flex-align: end;
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    align-items: flex-end;
+}
+.z-row-center {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    align-items: center;
+}
+.z-row-stretch {
+    -webkit-box-align: stretch;
+    -ms-flex-align: stretch;
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    align-items: stretch;
+}
+.z-row-baseline {
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    -webkit-align-items: baseline;
+    -moz-align-items: baseline;
+    align-items: baseline;
+}
+.z-row-column {
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+/* .z-col-* vertically aligns an individual .z-col */
+.z-col-top {
+    -webkit-align-self: flex-start;
+    -moz-align-self: flex-start;
+    -ms-flex-item-align: start;
+    align-self: flex-start;
+}
+.z-col-bottom {
+    -webkit-align-self: flex-end;
+    -moz-align-self: flex-end;
+    -ms-flex-item-align: end;
+    align-self: flex-end;
+}
+.z-col-center {
+    -webkit-align-self: center;
+    -moz-align-self: center;
+    -ms-flex-item-align: center;
+    align-self: center;
+}
+/*.z-column Offsets */
+.z-col-offset-10 {
+    margin-left: 10%;
+}
+.z-col-offset-20 {
+    margin-left: 20%;
+}
+.z-col-offset-25 {
+    margin-left: 25%;
+}
+.z-col-offset-33,
+.z-col-offset-34 {
+    margin-left: 33.3333%;
+}
+.z-col-offset-50 {
+    margin-left: 50%;
+}
+.z-col-offset-66,
+.z-col-offset-67 {
+    margin-left: 66.6666%;
+}
+.z-col-offset-75 {
+    margin-left: 75%;
+}
+.z-col-offset-80 {
+    margin-left: 80%;
+}
+.z-col-offset-90 {
+    margin-left: 90%;
+}
+/* Explicit.z-column Percent Sizes */
+/* By default each grid.z-column will evenly distribute */
+/* across the grid. However, you can specify individual */
+/*.z-columns to take up a certain size of the available area */
+.z-col-10 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 10%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 10%;
+    -ms-flex: 0 0 10%;
+    flex: 0 0 10%;
+    max-width: 10%;
+}
+.z-col-20 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 20%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 20%;
+    -ms-flex: 0 0 20%;
+    flex: 0 0 20%;
+    max-width: 20%;
+}
+.z-col-25 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 25%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 25%;
+    -ms-flex: 0 0 25%;
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+.z-col-33,
+.z-col-34 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 33.3333%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 33.3333%;
+    -ms-flex: 0 0 33.3333%;
+    flex: 0 0 33.3333%;
+    max-width: 33.3333%;
+}
+.z-col-40 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 40%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 40%;
+    -ms-flex: 0 0 40%;
+    flex: 0 0 40%;
+    max-width: 40%;
+}
+.z-col-50 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 50%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 50%;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+.z-col-60 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 60%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 60%;
+    -ms-flex: 0 0 60%;
+    flex: 0 0 60%;
+    max-width: 60%;
+}
+.z-col-66,
+.z-col-67 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 66.6666%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 66.6666%;
+    -ms-flex: 0 0 66.6666%;
+    flex: 0 0 66.6666%;
+    max-width: 66.6666%;
+}
+.z-col-75 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 75%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 75%;
+    -ms-flex: 0 0 75%;
+    flex: 0 0 75%;
+    max-width: 75%;
+}
+.z-col-80 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 80%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 80%;
+    -ms-flex: 0 0 80%;
+    flex: 0 0 80%;
+    max-width: 80%;
+}
+.z-col-90 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 90%;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 90%;
+    -ms-flex: 0 0 90%;
+    flex: 0 0 90%;
+    max-width: 90%;
+}
+
+
+.z-app {
+    width: 100%;
+    height: 100%;
+}
+.z-header {
+    height: 44px;
+    text-align: center;
+    color: #ffffff;
+    position: relative;
+}
+.z-header .z-header-title {
+    margin: 0 45px;
+    font-size: 18px;
+    height: 44px;
+    line-height: 44px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.z-tab {
+    width: 100%;
+    background: #ffffff;
+    border-collapse: collapse;
+    border: solid 1px #cccccc;
+}
+.z-tab th,
+.z-tab td {
+    padding: 5px;
+    border: solid 1px #cccccc;
+    border-collapse: collapse;
+    word-break: break-all;
+}
+.z-tab th {
+    font-weight: bold;
+}
+.z-tab .input,
+.z-tab .select {
+    border: solid 1px #cccccc;
+    height: 30px;
+    line-height: 30px;
+}
+
+
+.z-alert .z-alert_box {
+    position: fixed;
+    max-height: 400px;
+    min-width: 100px;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    overflow: auto;
+    background: #ffffff;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    z-index: 15;
+    padding: 15px;
+}
+.z-alert .z-alert_bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10;
+}

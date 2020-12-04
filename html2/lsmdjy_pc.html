@@ -1,0 +1,980 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>铝水密度检验</title>
+    <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" type="text/css" href="../css/base.css?a=32" media="screen" />
+    <script type="text/javascript" src="../js/jquery-1.8.2.js"></script>
+    <script src="../js/json2.js" type="text/javascript"></script>
+    <script src="../js/jquery.validate.min.js" type="text/javascript"></script>
+    <script src="../js/layer/layer.js"></script>
+    <script type="text/javascript" src="../js/api1.js"></script>    
+    <!--by panbb 新增加方法，SignalR  begin-->
+    <script type="text/javascript" src="/Scripts/jquery.y9socket.min.js"></script>
+    <script type="text/javascript" src="/Scripts/XSBApi.js"></script>
+    <!--by panbb 新增加方法，SignalR  end-->
+    <script type="text/javascript" b="by panbb 新增加方法">
+        var MyclientHub;
+        //接收signalR数据
+        function receive(data) {
+            //console.log("SignalR:" + data);
+            try {
+                //字符串验证，非符合字符串一律不进行逻辑处理
+                if (data.indexOf("{") != -1 && data.indexOf(":") != -1 && data.indexOf("}") != -1
+                    && data.indexOf("密度数据") != -1 && data.indexOf("type") != -1 && data.indexOf("status") != -1
+                    && data.indexOf("温度") != -1 && data.indexOf("总重量") != -1 && data.indexOf("空汤重量") != -1
+                    && data.indexOf("密度") != -1 && data.indexOf("time") != -1 && data.indexOf("类型") != -1) {
+                    try {
+                        var ret = JSON.parse(data);
+                        /*
+                        * {"类型":"密度","密度":"2.6"}
+                        * */
+                        if (ret["类型"] == "密度" && mdsd == 0) {
+                            //系统采集
+                            if (handwork == 0) {
+                                $("#FBucketWeight").val(ret["密度"]);
+                             
+                            }                            
+                        }
+
+                        if (ret["类型"] == "密度" && msgx == 0) {
+                            //系统采集
+                            $("input[name=sizedb]").val(ret["密度"]);
+                                                      
+                        }
+
+
+                    } catch (e) { }
+                }
+            } catch (e) { }
+        }
+
+        $(function () {
+            XSBApi.socket({
+                //服务器地址
+                ip: "127.0.0.1",
+                //端口号
+                port: "35051"
+            }, function (opt) {
+                MyclientHub = opt;
+            });
+        })
+
+    </script>
+    <script src="../js/common.js?a=22"></script>
+    <style>
+        .upfile {
+            float: right;
+            width: 60px;
+            height: 40px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            *border-top: 1px solid transparent;
+            _border-top: 1px solid transparent;
+        }
+
+            .upfile .filebtn {
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                line-height: 40px;
+                cursor: pointer;
+                background-color: #bd1738;
+                color: #fff;
+                font-size: 18px;
+            }
+
+        .fileaddress {
+            width: 730px !important;
+        }
+        .network {
+            color: white;
+            font-size: 22px;
+            text-align: center;
+            margin-top: 20px
+        }
+        .layui-layer-btn0{
+            display: block;
+            width: 100px;
+            font-size: 22px;
+            text-align: center;
+            height:40px !important;
+            line-height: 40px !important;
+            background-color: rgb(189,23,56) !important;
+            border:none !important;
+        }
+        .showOpen {
+            background: rgba(0, 0, 0, .8) !important;
+        }
+        .sizeBox{
+            color:white;
+            width:94%;
+            height: 40px;
+            margin-top:4%;
+        }
+        
+        .layui-layer-btn0,.layui-layer-btn1 {
+            display: block;
+            width: 100px;
+            font-size: 22px;
+            text-align: center;
+            height: 40px !important;
+            line-height: 40px !important;
+            background-color: rgb(189, 23, 56) !important;
+            border: none !important;
+            color:white !important;
+        }
+
+        .showOpen {
+            background: rgba(0, 0, 0, .8) !important;
+        }
+        .sizeName{
+            width:22%;
+            float:left;
+            font-size: 16px;
+            line-height: 40px;
+            text-indent: 1em;
+            background: rgb(85,85,85);
+        }
+        .sizeInput{
+            float: left;
+            width:58%;
+            margin-left: 2%;
+        }
+        .sizeInput>input{
+            width: 100%;
+            height: 40px;
+            background: rgb(85,85,85);
+            border:none;
+            color:#ffff00;
+            font-size: 16px;
+            text-indent: 1em;
+        }
+        .sizeBtn{
+            width: 16%;
+            height: 40px;
+            background-color:rgb(189, 23, 56);
+            border: none;
+            color:white;
+            margin-left:2%;
+            font-size:20px
+
+        }
+    </style>
+    <script src="../js/wstk.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            layer.msg('当前页面版本:v1.0.47');
+        })
+    </script>
+</head>
+<body style="background-image: url(../images/bg1.jpg);" oncontextmenu="self.event.returnValue=false">
+    <div class="ikd_head">
+        <img src="../images/logo.gif" class="ikd_hdImg" />
+        <span class="ikd_hdTit">原材料追溯系统</span>
+        <span class="ikd_hdTit1">极望J9产品追溯系统</span>
+
+
+        <div class="ikd_hdCls">
+            <button class="ikd_hdCls1">_</button>
+            <button class="ikd_hdCls2"></button>
+        </div>
+
+        <div class="ikd_hdBtu">
+            <span class="ikd_hdBtu1">操作工：<i id="CZG"></i></span>
+            <!--<button class="ikd_hdBtu3" onclick="outlogin()">退出登录</button>-->
+            <button class="ikd_hdBtu3" onclick="window.location='/pc/aspx/main.aspx'">返回主页</button>
+
+        </div>
+    </div>
+    <!--内容 begin-->
+    <div class="ikd_con">
+        <div class="ikd_cTit">
+            <span class="fl"><i></i>铝水密度检验</span>
+            <div class="checkbox sgtzbtn" onclick="sgtzbtn()"><div class="box"></div><span>异常操作</span></div>
+        </div>
+        <form id="f1" onsubmit="return false">
+            <input type="hidden" name="FCompanyID" id="FCompanyID" value="0" />
+            <table class="ikd_cB ikd_cB1" border="0" style="width: 985px">
+                <tr style="z-index: 1;">
+                    <td>
+                        <label class="ikd_cbTit">
+                            所属工厂
+                        </label>
+                    </td>
+                    <td colspan="2">
+                        <!-- onclick="selectMore(this)" -->
+                        <div id="gongchang123" onclick="selectMore(this)">
+                            <input class="ikd_cbTxt ikd_cbTxt1" id="factory" required />
+                            <input type="button" class="ikd_cbSet" />
+                        </div>
+                        <ul class="ikd_cbLt ikd_cbLt0"></ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            检验人员
+                        </label>
+                    </td>
+                    <td colspan="2">
+                        <input class="ikd_cbTxt ewm" required id="FCardNo" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            汤包编号
+                        </label>
+                    </td>
+                    <td colspan="2">
+                        <input class="ikd_cbTxt ewm" id="TBCode" required ewm="yg" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            小样编号
+                        </label>
+                    </td>
+                    <td colspan="2">
+                        <input class="ikd_cbTxt ewm" id="TBpcnumber" required ewm="yg" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            密度检验报告
+                        </label>
+                    </td>
+                    <td>
+                        <div class="upfile" style="margin-left: 10px;">
+                            <div class="filebtn" onclick="mdjy()">
+                                确定
+                            </div>
+                        </div>
+                        <div class="upfile">
+                            <div class="filebtn" onclick="mdgx()">
+                                更新
+                            </div>
+                        </div>
+                        <input class="ikd_cbTxt num fileaddress input4" name="FBWeight" required id="FBucketWeight" style="width: 490px!important;" data-usb="weak"  readonly/>
+                    </td>
+                    <td width="30%">
+                        <label class="z-checkbox" style="margin-left: 10px;">
+                            <input class="inputradio" value="1" type="radio" name="jybg" id="jybg1" onchange="jypd()" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">合格</span>
+                        </label>
+                        <label class="z-checkbox" style="margin-left: 10px;">
+                            <input class="inputradio" value="2" type="radio" name="jybg" id="jybg2" onchange="jypd()" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">不合格</span>
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            首包常压密度
+                        </label>
+                    </td>
+                    <td colspan="2">
+                        <input class="ikd_cbTxt sbcymd" name="sbcymd" required id="sbcymd" />
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            密度当量
+                        </label>
+                    </td>
+                    <td>
+                        <input class="ikd_cbTxt mddl" name="mddl" required id="mddl" style="width: 630px!important;" data-usb="weak" readonly/>
+                    </td>
+                    <td width="30%">
+                        <label class="z-checkbox" style="margin-left: 10px;">
+                            <input class="inputradio mddlcheck1" value="1" type="radio" name="mddlcheck" id="mddlcheck1" onchange="jypd()" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">合格</span>
+                        </label>
+                        <label class="z-checkbox" style="margin-left: 10px;">
+                            <input class="inputradio mddlcheck2" value="2" type="radio" name="mddlcheck" id="mddlcheck2" onchange="jypd()" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">不合格</span>
+                        </label>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            K模检验报告
+                        </label>
+                    </td>
+                    <td>
+                        <label class="z-checkbox">
+                            <input class="inputradio" value="0" type="radio" name="kmvalue" onchange="kmjy()">
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">0</span>
+                        </label>
+                        <label class="z-checkbox" style="margin-left: 20px;">
+                            <input class="inputradio" value="1" type="radio" name="kmvalue" onchange="kmjy()">
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">1</span>
+                        </label>
+                        <label class="z-checkbox" style="margin-left: 20px;">
+                            <input class="inputradio" value="2" type="radio" name="kmvalue" onchange="kmjy()">
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">2</span>
+                        </label>
+                        <label class="z-checkbox" style="margin-left: 20px;">
+                            <input class="inputradio" value="3" type="radio" name="kmvalue" onchange="kmjy()">
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">3</span>
+                        </label>
+                        <label class="z-checkbox" style="margin-left: 20px;">
+                            <input class="inputradio" value="4" type="radio" name="kmvalue" onchange="kmjy()">
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">4</span>
+                        </label>
+                    </td>
+                    <td width="30%">
+                        <label class="z-checkbox" style="margin-left: 10px;">
+                            <input class="inputradio" value="1" type="radio" name="kmo" id="kmo1" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">合格</span>
+                        </label>
+                        <label class="z-checkbox" style="margin-left: 10px;">
+                            <input class="inputradio" value="0" type="radio" name="kmo" id="kmo2" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">不合格</span>
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ikd_cbTit">
+                            判定结果
+                        </label>
+                    </td>
+                    <td colspan="2">
+                        <div class="z-checkbox">
+                            <input class="inputradio" value="1" type="radio" name="jieguo" id="jieguo1" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">合格</span>
+                        </div>
+                        <div class="z-checkbox" style="margin-left: 20px;">
+                            <input class="inputradio" value="0" type="radio" name="jieguo" id="jieguo2" disabled>
+                            <i class="z-checked"></i>
+                            <span class="z-checktxt">不合格</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="formoperation">
+                        <input type="button" value="历史记录" class="ikd_cbBtu" tabindex="7" onclick="history()" />
+                        <input onclick="printList()" type="button" value="补打标签" class="ikd_cbBtu" tabindex="8" />
+                        <input onclick="Confirm()" type="button" value="确定" class="ikd_cbBtu" tabindex="6" id="form_submit" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <!--<button class="ikd_cBtu"></button>-->
+    </div>
+    <!--内容 end-->
+</body>
+<script>
+// 获取地址栏参数
+    function getUrlname(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+    var handwork = 0;//是否手工提交标记 0 系统采集 1手工
+    var cid = getUrlname("cid") || 0;//默认未传参数为0下来工厂信息显示所有工厂
+    /* 手工调整 */
+    function sgtzbtn() {
+        if ($('#factory').attr('fid') == undefined || $('#factory').attr('fid') == "") {
+            layer.msg("请选择工厂！");
+            return false;
+        }
+        if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined) {
+            layer.msg("请扫描员工信息！");
+            return false;
+        } 
+        if ($('#TBpcnumber').val() == "") {
+            layer.msg("请扫描小样二维码！");
+            return false;
+        }
+
+        if ($(".sgtzbtn").find(".box").hasClass("active")) {
+            //console.log("关闭手工处理");
+            handwork = 0;            
+            $("#FBucketWeight").val("");
+            $('input:radio[name=jybg]').attr('checked', false);           
+
+            $(".sgtzbtn").find(".box").removeClass("active");
+            $("#FBucketWeight").addClass("ikd_cbTxt").attr("readonly", true);      
+            $("#FBucketWeight").blur();  
+        } else {
+            //console.log("开启手工处理");
+            handwork = 1;            
+            $("#FBucketWeight").val("");
+            $('input:radio[name=jybg]').attr('checked', false);
+            $(".sgtzbtn").find(".box").addClass("active");
+
+            $("#FBucketWeight").removeClass("ikd_cbTxt").attr("readonly", false);   
+            $("#FBucketWeight").focus();         
+        }
+    }
+
+    var mdsd = 0;
+    function mdgx() {
+        mdsd = 0;
+        $("#jybg1").removeAttr("checked");
+        $("#jybg2").removeAttr("checked");
+        $("#FBucketWeight").val("");
+    }
+
+
+    var msgx = 0;
+    function meilun(){
+        msgx = 0;
+        $(".sizeInput>input").val("");
+    }
+
+    /* 密度检验 */
+    function mdjy() {
+        if ($("#FBucketWeight").val() != "") {
+            mdsd = 1;
+            com.submit('api40334', {
+                FMDCheckValue: $("#FBucketWeight").val(),
+                FCompanyID: $('#factory').attr("fid")
+            }, function (data) {
+                if (data.ds[0].status == "000000") {
+                    $("#jybg2").removeAttr("checked");
+                    $("#jybg1").attr("checked", "checked");
+                } else {
+                    $("#jybg1").removeAttr("checked");
+                    $("#jybg2").attr("checked", "checked");
+                }
+                
+                var sbcymd = Number($("input[name=sbcymd]").val());
+                var FBWeight = Number($("input[name=FBWeight]").val());
+                if(sbcymd){
+                    var result = (sbcymd - FBWeight) / sbcymd * 100;
+                    $("input[name=mddl]").val(result.toFixed(2)+"%");
+                    if(Number(result.toFixed(2)) < 4){
+                        $("#mddlcheck1").removeAttr("checked");
+                        $("#mddlcheck2").removeAttr("checked");
+                        $("#mddlcheck1").attr("checked", "checked");
+                    }else{
+                        $("#mddlcheck1").removeAttr("checked");
+                        $("#mddlcheck2").removeAttr("checked");
+                        $("#mddlcheck2").attr("checked", "checked");
+                    }
+                }
+                jypd();
+            });
+        } else {
+            layer.msg("未接收到检验报告信息！");
+        }
+    }
+
+    // KM值选择
+    function kmjy() {
+        var t = $("input[name=kmvalue]:checked").val()
+        if (t == undefined || t == null || t == "") {
+
+        }
+        else if (t == 0 || t == 1) {
+            $("#kmo1").attr("checked", "checked");
+            $("#kmo2").removeAttr("checked")
+        } else {
+            $("#kmo2").attr("checked", "checked");
+            $("#kmo1").removeAttr("checked")
+        }
+
+        jypd();
+    }
+
+    /* 温度检验 */
+    function wendujy() {
+        com.submit('api40335', {
+            FWDCheck: $("#wendu").val(),
+            FCompanyID: $('#factory').attr("fid")
+        }, function (data) {
+            if (data.ds[0].status == "000000") {
+                $("#wendu2").removeAttr("checked");
+                $("#wendu1").attr("checked", "checked");
+            } else {
+                $("#wendu1").removeAttr("checked");
+                $("#wendu2").attr("checked", "checked");
+            }
+            jypd();
+        })
+    } 
+
+    function istrue(t) {
+        if (t == true || t == "checked" || t == "true") {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    /* 检验判断 */
+    function jypd() {
+        var md = $("input[name=jybg]:checked").val();
+        var kmo = $("input[name=kmo]:checked").val();
+        var mddlcheck = $("input[name=mddlcheck]:checked").val();
+        if (mddlcheck == undefined || mddlcheck == null || mddlcheck == "") { 
+            mddlcheck = 1;
+        }
+
+        if (md == undefined || md == null || md == "") {
+            $("#jieguo1").removeAttr("checked");
+            $("#jieguo2").removeAttr("checked");
+            return;
+        }
+        if (kmo == undefined || kmo == null || kmo == "") {
+            $("#jieguo1").removeAttr("checked");
+            $("#jieguo2").removeAttr("checked");
+            return;
+        }
+        
+
+
+
+
+        if (istrue(md) && istrue(kmo) && istrue(mddlcheck)) {
+            $("#jieguo1").attr("checked", "checked");
+            $("#jieguo2").removeAttr("checked");
+        } else {
+            $("#jieguo1").removeAttr("checked");
+            $("#jieguo2").attr("checked", "checked");
+        }
+    }
+
+
+    $(function () {
+        scan();
+        getGCList();
+        // getDefaultGC();
+        //biaoding()
+        try {
+            var _FEmplID = localStorage.getItem('FEmplID');
+            var _FEmplname = localStorage.getItem('FEmplname');
+            $('#CZG').text(_FEmplname);
+            $('#FCardNo').val(_FEmplname).attr("realvalue", _FEmplID);
+        } catch (e) { }
+    });
+
+    function outlogin() {
+        $.get("?cmd=9999", function () {
+            window.location = "/pc/aspx/login.aspx";
+        });
+    }
+
+    //默认工厂
+    function getDefaultGC() {
+        localStorage.FCompanyID = $('#factory').attr('fid');
+        localStorage.FCompanyName = $('#factory').val();
+    }
+
+    //工厂下拉
+    function getGCList() {
+
+        if (localStorage.FCompanyName != undefined && localStorage.FCompanyID != undefined) {
+            $('#factory').val(localStorage.FCompanyName).attr('fid', localStorage.FCompanyID);
+        }
+
+        //所属工厂api39652
+        com.submit('api39652', {FCompanyID:cid}, function (data) {
+            // console.log(data);
+            try {
+                var html = '';
+                data.ds.forEach(function (value) {
+                    html += '<li fid="' + value.FCompanyID + '">' + value.FCompanyName + '</li>'
+                });
+                $('#factory').parent('div').next().html(html);
+                //触发下拉事件
+                $("#gongchang123").click();
+            } catch (e) {
+                console.error(e)
+            }
+        })
+    }
+
+    function biaoding(){
+        var str = $(".weight").html();
+        layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            zIndex: 99,
+            shadeClose: false,
+            skin: "showOpen",
+            area: ['80%', '60%'],
+            content: str,
+            btn: ["确定","退出"],
+            yes:function(index){
+                var FMDCheckValue01 = $("input[name=sizedb]").val();
+                if(!FMDCheckValue01){
+                    layer.msg("密度报告不能为空");
+                    return false;
+                }
+                localStorage.setItem("FMDCheckValue01",FMDCheckValue01);
+                $("input[name=sbcymd]").val(FMDCheckValue01);
+                layer.close(index);
+                mdgx();
+            },
+            "btn2":function(index){
+                console.log(111111)
+                layer.close(index)
+            }
+        });
+    }
+
+
+
+    var MDdata = {};
+    //扫描
+    function scan() {
+        com.usb.init(scandata);
+    }
+    function scandata(code) {
+        if (/^{/.test(code)) {
+            var obj = eval('(' + code + ')');
+            if (obj.q.toUpperCase() == 'CTPC') {
+                if ($('#factory').attr('fid') == undefined || $('#factory').attr('fid') == "") {
+                    layer.msg("请选择工厂！");
+                    return false;
+                } else if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined) {
+                    layer.msg("请扫描员工信息！");
+                    return false;
+                } 
+
+                //根节点 > PDA程序 > 汤包称重检验 > 汤包称重 > 汤包编号扫描api40246
+                //{"q":"ZYB","n":"3001","k":"ZYB3001"}
+                com.submit('api40305', {
+                    FCodeindx: obj.n
+                }, function (data) {
+                    // console.log(data);
+                    if (data.ds[0].status == "000000") {
+                        //扫描到小样信息后页面数据清理
+                        clearData();
+                        // biaoding();
+                        $('#TBCode').val(data.ds1[0].FTBNumber).attr("fid", data.ds1[0].FQRCodeRLID);
+                        $('#TBpcnumber').val(data.ds1[0].FCodeindx);
+                        // $("#wendu").val(data.ds1[0].FWDCheck);
+                        MDdata = data.ds1[0];   
+                        if(cid == 86){
+                            var TBpcnumber = $("#TBpcnumber").val();
+ 			    localStorage.removeItem("FISFirst");
+                            console.log(TBpcnumber)
+                            if(TBpcnumber){
+                                com.submit("api40305",{
+                                    FCodeindx:TBpcnumber
+                                },function(ret){
+                                    console.log(ret);
+                                    try{
+                                        if(ret.ds[0].status == "000000"){
+                                            localStorage.setItem('FISFirst',ret.ds1[0].FISFirst);
+                                            if(ret.ds1[0].FISFirst == 1){
+                                                biaoding()
+                                            }
+                                        }
+                                    }catch(e){
+                                        layer.msg(e);
+                                    }
+                                  
+                                })
+                            }
+                        }
+
+                        // wendujy();
+                    } else {
+                        layer.msg(data.ds[0].msg);
+                        clearData();
+                    }
+                });
+            } else {
+                layer.msg("小样二维码出错格式不识别！");
+                clearData();
+            }
+        } else {
+            //扫描员工卡api40248
+            // 员工二维码  200522  100767 100013
+            com.submit('api40248', {
+                FCardCode: code
+            }, function (data) {
+                //  console.log(data);
+                try {
+                    if (data.ds[0].status === '000000') {
+                        localStorage.setItem('FEmplID', data.ds1[0].FEmplID);
+                        localStorage.setItem('FEmplname', data.ds1[0].FEmplname);
+                        $('#CZG').text(data.ds1[0].FEmplname);
+                        $('#FCardNo').val(data.ds1[0].FEmplname).attr("realvalue", data.ds1[0].FEmplID);
+                        layer.msg(data.ds[0].msg);
+                    } else {
+                        layer.msg(data.ds[0].msg)
+                    }
+                } catch (e) {
+                    console.error(e)
+                }
+            })
+        }
+    }
+
+    //页面数据清理初始化
+    function clearData() {
+        //扫描到小样信息后页面数据清理
+        //初始化密度
+        $('#FBucketWeight').val("");
+        $('input:radio[name=jybg]').attr('checked', false);
+        //初始化K模
+        $('input:radio[name=kmvalue]').attr('checked', false);
+        $('input:radio[name=kmo]').attr('checked', false);
+        //初始化检验结果
+        $('input:radio[name=jieguo]').attr('checked', false);
+
+        $('#TBCode').val("").attr("fid","");
+        $('#TBpcnumber').val("");
+
+        //手工处理选择项初始化
+        handwork = 0;
+        if ($(".sgtzbtn").find(".box").hasClass("active")) {//关闭手工处理
+            $(".sgtzbtn").find(".box").removeClass("active");
+            $("#FBucketWeight").addClass("ikd_cbTxt").attr("readonly", true);
+        }
+    }
+
+    function selectMore(dom, e) {
+        e = e || window.event;
+        e.stopPropagation();
+        var ul = $(dom).next();
+        ul.toggle();
+        ul.find('li').click(function () {
+            $('#factory').val($(this).text()).attr('fid', $(this).attr('fid'));
+            ul.hide();
+            getDefaultGC();
+        });
+        $(document).on('click', function () {
+            ul.hide();
+        })
+    }
+
+    //历史记录
+    function history() {
+        if (localStorage.getItem('FCompanyID') == undefined || localStorage.getItem('FCompanyID') == '') {
+            layer.msg('当前无工厂信息<br/>请选择工厂信息才可以查看历史记录！')
+        } else {
+       
+              location.href = 'history2.html?a=14&FCompanyID=' + localStorage.getItem('FCompanyID') + '&FEmplID=' 
+                + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'));
+
+          /*   layer.open({
+                type: 2,
+                title: false,
+                closeBtn: false,
+                area: ['100%', '100%'],
+                content: 'history2.html?a=14&FCompanyID=' + localStorage.getItem('FCompanyID') + '&FEmplID=' 
+                + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'))
+            });*/
+        }
+    }
+
+    //补打标签
+    function printList() {
+      //  layer.msg(localStorage.FEmplID)
+        if (localStorage.getItem('FCompanyID') == undefined || localStorage.getItem('FCompanyID') == '') {
+            layer.msg('当前无工厂信息<br/>请选择工厂信息才可以补打小票！');
+        }
+        else if (localStorage.getItem('FEmplID') == undefined || localStorage.getItem('FEmplID') == '') {
+            layer.msg('当前无操作人员信息<br/>请扫描员工条码才可以补打小票！');
+        } else {
+            //layer.open({
+           //     type: 2,
+           //     title: false,
+           //     closeBtn: false,
+           //     area: ['100%', '100%'],
+           //     content: 'history3.html?a=14&FEmplID=' + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'))
+           //            + '&FCompanyID=' + localStorage.FCompanyID + '&FCompanyName=' + escape(localStorage.FCompanyName)
+           // });
+
+           // location.href = 'history.html?a=43&FEmplID=' + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'))
+           //            + '&FCompanyID=' + localStorage.FCompanyID + '&FCompanyName=' + escape(localStorage.FCompanyName);
+
+ 	   location.href = "./history3.html?a=1&cid=" + localStorage.getItem('FCompanyID')+'&FEmplID=' 
+       		 + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'));
+        }
+    }
+
+    //确定
+    function Confirm() {
+        if ($('#factory').attr('fid') == undefined || $('#factory').attr('fid') == "") {
+            layer.msg("请选择工厂！");
+            return false;
+        }
+        if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined) {
+            layer.msg("请扫描员工信息！");
+            return false;
+        }
+        if ($('#TBpcnumber').val() == "") {
+            layer.msg("请扫描小样二维码！");
+            return false;
+        }
+
+        var md = $("input[name='jybg']:checked").val();
+        var kmo = $("input[name='kmo']:checked").val();
+        // var wd = $("#wendu1").attr("checked");
+        // var kmo1 = $("#kmo1").attr("checked");
+        // var kmo2 = $("#kmo2").attr("checked");
+        var zt = $("input[name='jieguo']:checked").val();
+
+        // console.log('md:' + md);
+        //  console.log('kmo1:' + kmo1)
+        // console.log('kmo2:' + kmo2)
+        // console.log('zt:' + zt);
+
+        var FMDCheckResult = 0;
+
+        if (md == undefined || md == null || md == "") {
+            layer.msg("请确认密度检验报告是否已提交！");
+            return false;
+        } else if (istrue(md)) {
+            FMDCheckResult = 1;
+        } else {
+            FMDCheckResult = 0;
+        }
+
+        // var FKModalCheckResult = 0;
+        if (kmo == undefined || kmo == null || kmo == "") {
+            layer.msg("请选择K模结果！");
+            return false;
+        }
+
+        var FCheckResult = 0;
+        if (istrue(zt)) {
+            FCheckResult = 1;
+        } else {
+            FCheckResult = 0;
+        }
+        var FKModalCheck = $("input[name=kmvalue]:checked").val();
+        var FMDCheckValue01 = localStorage.getItem("FMDCheckValue01") || "";
+        var FISFirst = localStorage.getItem("FISFirst") || "";
+        open_config();
+        //    console.log('FKModalCheck:' + FKModalCheck);
+        //    console.log('FKModalCheckResult:' + kmo);
+        //    console.log('FMDCheckResult:' + FMDCheckResult);
+        //     console.log('FCheckResult:' + FCheckResult);
+
+        // 汤包称重确定api40247
+        com.submit('api40307', {
+            FSoupCZID: MDdata.FSoupCZID/*汤包称重ID，主表主键ID(Int)*/,
+            FQCEmplID: $('#FCardNo').attr("realvalue")/*检验员ID(Int)*/,
+            FMDCheckDoc: ""/*密度检验报告文件路径名(VarChar)*/,
+            FMDCheckResult: FMDCheckResult/*密度检验结果；0--不合格；1--合格(Int)*/,
+            // FWDCheck:  $("#wendu").val()/*温度检验值(Decimal)*/,
+            // FWDCheckResult:  FWDCheckResult/*温度检验结果；0--不合格；1--合格(Int)*/,
+            FCheckResult: FCheckResult/*总体检验结果；0--不合格；1--合格(Int)*/,
+            FMDCheckValue: $("#FBucketWeight").val()/*密度检验值(Decimal)*/,
+            FKModalCheckResult: kmo/*K模合格(Int)*/,
+            FCodeindx: MDdata.FCodeindx/*出汤批次（小样二维码）(VarChar)*/,
+            FQRCodeRLID: MDdata.FQRCodeRLID/*汤包ID(Int)*/,
+            FTBNumber: MDdata.FTBNumber/*汤包编号(VarChar)*/,
+            FCompanyID: $('#factory').attr("fid")/*检查区域厂区(Int)*/,
+            FKModalCheck: FKModalCheck/*K模值(Int)*/,
+            FMDhandwork: handwork,/**是否手工提交密度 0否 1是 **/
+            FMDCheckValue01:FMDCheckValue01, /**首包密度**/
+            FCount:FISFirst
+        }, function (data) {
+            try {
+                if (data.ds[0].status == "000000") {
+                    localStorage.removeItem("FMDCheckValue01");
+                    localStorage.removeItem("FISFirst");
+                    layer.msg("保存成功", { time: 1000 }, function () {
+                        layer.close(index);
+                        location.reload();
+                    })
+                } else {
+                    layer.close(index);
+                    layer.msg(data.ds[0].msg);
+                }
+
+            } catch (e) {
+                $(".network").text(e);
+            }
+        });
+    }
+
+    function closeFrame() {
+        layer.closeAll();
+    }
+
+
+    var index = null;
+    netWorkStatus = null;
+    function open_config() {
+        netWorkStatus = navigator.onLine;
+        var html = $('.info-tishi').html();
+        var str = ""
+        if (netWorkStatus) {
+            str = html;
+            index = layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                zIndex: 99999999999,
+                shadeClose: false,
+                skin: "showOpen",
+                area: ['80%', '80%'],
+                content: str
+            });
+        } else {
+            result = html.replace(/提交中/, "提交失败");
+            str = result.replace(/网络正常/, "网络异常,请联系IT部门");
+            index = layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                zIndex: 99999999999,
+                shadeClose: false,
+                skin: "showOpen",
+                area: ['80%', '80%'],
+                content: str,
+                btn: ["确定"] 
+            });
+        }
+    }
+
+</script>
+</html>
+<script type="text/html" class="info-tishi" beizhu="模板">
+    <div class="div_config" style="margin-top:26%;height:40px;">   
+       <div style="color:white;font-size:30px;line-height:40px;text-align:center">提交中</div>
+    </div>
+    <div class="network">网络正常</div>
+</script>
+<script type="text/html" class="weight" beizhu="模板">
+    <div style="width:80%;margin:0 auto;margin-top:4%">
+        <div style="color:white;font-size:20px">每炉首包密度获取</div>
+        <div class="sizeBox">
+            <div class="sizeName">密度检验报告</div>
+            <div class="sizeInput"><input type="text" name="sizedb" value="2.643" /></div>
+            <button type="button" class="sizeBtn" onclick="meilun()">更新</button>
+        </div>
+    </div>
+</script>

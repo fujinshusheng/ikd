@@ -1,0 +1,13 @@
+@charset "UTF-8";
+html,body{
+    height: 100%;
+    overflow: hidden;
+}
+.table1{
+    padding: 10px;
+    overflow-y: auto;
+}
+.table2{
+    padding: 10px;
+    overflow-y: auto;
+}

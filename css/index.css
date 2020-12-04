@@ -1,0 +1,10 @@
+@charset "UTF-8";
+
+.table1{
+    padding: 10px;
+    overflow: auto;
+}
+.table2{
+    padding: 10px;
+    overflow: auto;
+}

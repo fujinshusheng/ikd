@@ -1,0 +1,237 @@
+﻿html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-size: 12px;
+    background: url(../images/login_bg.jpg) no-repeat top center;
+}
+
+* {
+    font-family: "Microsoft YaHei","微软雅黑","STHeiti","WenQuanYi Micro Hei",SimSun,sans-serif,Arial,"宋体";
+}
+
+a {
+    font-size: 12px;
+    text-decoration: none;
+    color: #666;
+    background: transparent;
+    vertical-align: baseline;
+    -webkit-transition: all 0.2s ease;
+    -moz-transition: all 0.2s ease;
+    transition: all 0.2s ease
+}
+
+[placeholder]:focus::-webkit-input-placeholder {
+    -webkit-transition: opacity 0.5s ease;
+    -moz-transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease;
+    opacity: 0
+}
+
+[placeholder]:focus::-moz-input-placeholder {
+    -webkit-transition: opacity 0.5s ease;
+    -moz-transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease;
+    opacity: 0
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, button, textarea, p, blockquote, th, td, i {
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+img {
+    border: 0;
+    vertical-align: middle;
+    display: block;
+}
+
+address, caption, cite, code, dfn, em, strong, th, var, optgroup, i {
+    font-style: normal;
+    font-weight: inherit;
+}
+
+li {
+    list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: 100%;
+    font-weight: normal;
+}
+
+q:before, q:after {
+    content: '';
+}
+
+input, button, textarea, select, optgroup, option, i {
+    font-family: inherit;
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    vertical-align: middle;
+}
+
+input, button, textarea, select {
+    *font-size: 100%;
+}
+
+button {
+    cursor: pointer;
+}
+
+.fl {
+    float: left;
+    display: inline;
+}
+/*消除ie6浮动产生的双边距*/
+.fr {
+    float: right;
+    display: inline;
+}
+/*消除ie6浮动产生的双边距*/
+.hidden {
+    visility: hidden;
+}
+
+.none {
+    display: none;
+}
+
+.hide {
+    display: none;
+}
+
+.clear {
+    clear: both;
+}
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+.pa {
+    position: absolute;
+}
+
+.pr {
+    position: relative;
+}
+
+/*********头部 begin***********************************/
+.ikd_loghd {
+    margin: 150px auto auto 145px;
+    height: 55px;
+    line-height: 55px;
+    width: 220px;
+    background: url(../images/log_logo.png) no-repeat left center;
+    _background: url(../images/log_logo1.png) no-repeat left center;
+    padding-left: 200px;
+    font-size: 35px;
+    color: #fefeff;
+}
+
+.ikd_loghd1 {
+    padding-left: 50px;
+    height: 36px;
+    line-height: 36px;
+    width: 185px;
+    margin:10px auto 50px 250px;
+    background: url(../images/log_icon.png) no-repeat left center;
+    _background: url(../images/log_icon1.png) no-repeat left center;
+    font-size: 20px;
+    color: #fefeff;
+}
+
+/******内容 begin***********************************/
+.ikd_logc {
+    width: 650px;
+    margin: 0 auto;
+}
+
+.ikd_logImg {
+    padding-right:10px;
+    float: left;
+    width: 125px;
+    height: 125px;
+    border-radius: 5px;
+}
+
+.ikd_logcr {
+    float: left;
+    margin-left: 40px;
+    width: 460px;
+    margin-left: 0px;
+}
+
+.ikd_logInpt {
+    border: 2px solid #fff;
+    border-radius: 6px;
+    background: url(../images/log_icon2.png) no-repeat;
+    _background: url(../images/log_icon3.png) no-repeat;
+    width: 200px;
+    height: 50px;
+    color: #fefeff;
+    font-size: 20px;
+    padding-left: 50px;
+    margin-bottom: 15px;
+    line-height: 50px;
+}
+
+.ikd_logInpt1 {
+    background-position: 17px 14px;
+}
+
+.ikd_logInpt2 {
+    background-position: 17px -39px;
+}
+
+.ikd_logcb {
+    clear: both;
+}
+
+    .ikd_logcb .ikd_lbtu {
+        display: inline-block;
+        background: #bd1738;
+        width: 255px;
+        height: 50px;
+        color: #fff;
+        font-size: 24px;
+        border: none;
+        border-radius: 5px;
+        margin: 20px auto 0px 135px;
+    }
+
+    .ikd_logcb .ikd_lbtu1 {
+        width: 140px;
+        margin-left: 0px;
+    }
+
+.ikd_logb {
+    width: 1200px;
+    margin: 166px auto 0px;
+    color: #fefeff;
+    font-size: 24px;
+    text-align: right;
+    line-height: 140px;
+}

@@ -1,0 +1,692 @@
+
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>汤包送检看板</title>
+    <meta name="viewport" content="width=960,target-densitydpi=480, user-scalable=no">
+    <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" href="../css/commont.css">
+    <link rel="stylesheet" href="../css/Lkanban.css?a=6">
+    <link rel="stylesheet" href="../css/demo.css">
+    <link rel="stylesheet" type="text/css" href="../css/base.css?a=25" media="screen"/>
+    <link rel="stylesheet" href="../js/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <script type="text/javascript" src="../js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="../js/jquery.json2xml.js?a=1"></script>
+    
+    <script src="../js/json2.js" type="text/javascript"></script>
+    <script src="../js/jquery.validate.min.js" type="text/javascript"></script>
+    <script src="../js/layer/layer.js"></script>
+    <script src="../js/layui/layui.all.js"></script>
+
+    <script type="text/javascript" src="../js/api1.js"></script>
+</head>
+<body style="background-image: url(../images/bg1.jpg);" oncontextmenu="self.event.returnValue=false">
+    <div class="z-app z-row z-row-column">
+        <div>
+            <div style="text-align:center;float: left;position: relative;left:31%">   
+                <header><h1></h1></header>
+            </div>
+            <div class="ikd_hdBtutIL">     
+                <span class="ikd_hdBtu1">操作工：<i id="CZG"></i></span>
+                <input type="hidden" id="FCardNo"/>
+                <button class="ikd_hdBtu3" onclick="window.location='/pc/aspx/main.aspx'">返回主页</button>
+            </div>
+                
+        </div>
+        <div class="center z-col">
+            <div class="legend" style="position: relative;">
+                <span style="margin-left: 20px;"></span>
+                <ul class="legend-list">
+                    <li><i class="cir"></i>NG</li>
+                    <li><i class="cir" style="background: rgb(37,184,9);"></i>OK</li>
+                    <li><i class="cir" style="background: rgb(242,101,2);"></i>检验中</li>
+                    <li><i class="cir" style="background: rgb(148,148,148);"></i>出汤/闲置</li>
+                </ul>
+                <div id="soundbtn"><div id="time" style="margin-right:120px;margin-top:12px;position: relative;font-size:14px;"></div><button type="button" onclick="historiyRecords()">历史记录</button></div>
+            </div>
+            <div class="mainInfo">
+                <div class="allBox">
+                    <div class="headerTitle" id="chuqiji1"></div>
+                    <div class="bottomTb" id="bottomTb1"></div> 
+                    <div class="bottominfolist" id="bottominfolist1">
+                        <div class="chuqitime">除气时间&#12288; <span  id="fst1"></span></div>
+                        <div class="chuqitime">开始计时&#12288; <span  id="fet1"></span></div>
+                        <div class="chuqitime">温&#12288;&#12288;度&#12288; <span  id="fwd1"></span></div>
+                    </div> 
+                    <div class="bottomendbtn" id="bottomendbtn1">
+                        <button type="button">除气机结束按钮</button>
+                    </div> 
+                </div>
+                <div class="allBox">
+                    <div class="headerTitle" id="chuqiji2"></div>
+                    <div class="bottomTb" id="bottomTb2"></div>
+                    <div class="bottominfolist" id="bottominfolist2">
+                        <div class="chuqitime">除气时间&#12288; <span  id="fst2"></span></div>
+                        <div class="chuqitime">开始计时&#12288; <span  id="fet2"></span></div>
+                        <div class="chuqitime">温&#12288;&#12288;度&#12288; <span  id="fwd2"></span></div>
+                    </div> 
+                    <div class="bottomendbtn" id="bottomendbtn2">
+                        <button type="button">除气机结束按钮</button>
+                    </div> 
+                </div>
+                <div class="allBox">
+                    <div class="headerTitle" id="chuqiji3"></div>
+                    <div class="bottomTb" id="bottomTb3"></div>
+                    <div class="bottominfolist" id="bottominfolist3">
+                        <div class="chuqitime">除气时间&#12288; <span  id="fst3"></span></div>
+                        <div class="chuqitime">开始计时&#12288; <span  id="fet3"></span></div>
+                        <div class="chuqitime">温&#12288;&#12288;度&#12288; <span  id="fwd3"></span></div>
+                    </div> 
+                    <div class="bottomendbtn" id="bottomendbtn3">
+                        <button type="button">除气机结束按钮</button>
+                    </div> 
+                </div>
+
+            </div>
+            <!-- 遮罩层区域-->
+            <div class="alertInfo">
+                <div class="tbInfo alert1"></div>
+                <div class="tbInfo alert2"></div>
+                <div class="tbInfo alert3"></div>
+            
+                <div class="againshadow test1"></div>
+                <div class="againshadow test2"></div>
+                <div class="againshadow test3"></div>
+            </div>
+        </div>
+        <div class="bottom">
+            <div style="clear: both;"></div>
+        </div>
+
+    </div>
+
+</body>
+<script src="../js/common.js?a=1"></script>
+<script src="../js/Lodop/LodopFuncs.js"></script>
+<script src="../js/Lodop/jwPrintList_shi.js?a=2"></script>
+<script type="text/javascript">
+// 获取地址栏参数
+    function getUrlname(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+
+    var cid = getUrlname("cid");
+    var FEmplID =  getUrlname("FEmplID");
+    var isopne =[0,0,0]; //标记当前页面是否已打开遮罩
+    $(function () {
+        layer.msg('当前页面版本:v1.0.39');
+        com.usb.init(scandata); 
+        getDataList();
+        getDate();
+        setInterval("getDate()",990);
+        try {
+            var _FEmplID = localStorage.getItem('FEmplID');
+            var _FEmplname = localStorage.getItem('FEmplname');
+            $('#CZG').text(_FEmplname);
+            $('#FCardNo').val(_FEmplname).attr("realvalue", _FEmplID);
+        } catch (e) { }
+    })
+   
+    //获得时间
+    function getDate() {
+        var date = new Date();
+        var y = date.getFullYear(); //年
+        var m = date.getMonth() + 1; //月
+        m = m < 10 ? ('0' + m) : m;
+        var d = date.getDate();//日
+        d = d < 10 ? ('0' + d) : d;
+        var h = date.getHours();//时
+        h = h < 10 ? ('0' + h) : h;
+        var minute = date.getMinutes();//分
+        minute = minute < 10 ? ('0' + minute) : minute;
+        var second = date.getSeconds(); //秒
+        second = second < 10 ? ('0' + second) : second;
+
+        var datestr = y + "年" + m + "月" + d + "日 " + h + ":" + minute + ":" + second;
+        $("#time").html(datestr);
+    }
+
+    //searchData(params,'FNameplateID',"6290021",'FArea')
+    //获取数组中指定页签数组中指定值 fhkeyval未指定返回字段则返回数组，指定字段则返回具体值
+    function searchData(params,key,val,fhkeyval){
+        if(!params) return null;
+        for(data of params){
+            if(data[key] === val){
+                if(!fhkeyval){
+                    return data;
+                }else{
+                    return data[fhkeyval];
+                }                
+            }
+        }
+    }
+
+     //获取列表信息
+    var dataObject = null;
+    var dataInterval =  1000;
+    var timeTag = null;
+    function getDataList() {    
+        if(!cid){
+            layer.msg("请传入工厂ID");
+            return false;
+        }
+        com.submit('api53356', {
+            FCompanyID: cid
+        }, function (datas) {
+            try {
+                if (datas.ds[0].status == "000000") {
+                    dataInterval = datas.ds1[0]["time"];
+                    dataObject = datas.ds2;
+                    //标题赋值
+                    $("header h1").text(datas.ds1[0]['看板标题'])
+                    $(".legend span").text(datas.ds1[0]['标题']);
+                    var titlestyle = "{" + datas.ds1[0]['titlestyle'] + "}";
+                    $("header h1").css(JSON.parse(titlestyle));
+                    var thstyle = "{" + datas.ds1[0]['thstyle'] + "}";
+                    $(".legend span").css(JSON.parse(thstyle));
+                    //列表赋值
+                    var resultDatas = datas.ds2;
+                  //  console.log(resultDatas);
+                    console.log(datas)
+                    for(resultData of resultDatas){
+                        var titleText = '<button onclick="tbReset(this)" type="button" data-FSoupCZID=' +  resultData["FSoupCZID"]  +  ' data-FArea=' +  resultData["FArea"]  +'  data-FNameplateID=' + resultData["FNameplateID"] +'>重置</button>' + resultData["FCode"]; 
+                        $("#chuqiji" + resultData["FArea"]).html(titleText);
+                        $("#chuqiji" + resultData["FArea"]).css("background",resultData["FCQJBgColor"]);
+                        
+                        var str = "";
+                        if(resultData["FTBNumber"]){
+                            str += `<div class="tbBox" style="background:${resultData.FTBBgColor};">${resultData.FStatus}</div>
+                                    <p>${resultData.FTBNumber}</p>
+                                    <div class="tempShow" style="background:${resultData.FTBBgColor}"></div>
+                                    `;
+                        }
+                        $("#chuqiji" + resultData["FArea"]).siblings(".bottomTb").html(str); 
+                        $("#fst" + resultData["FArea"]).html(resultData.FCQT);
+                        $("#fet" + resultData["FArea"]).html(resultData.FST);
+                        $("#fwd" + resultData["FArea"]).html(resultData.FWD)
+
+                    }  
+                    //成功以后监听检验结果
+                    jianTbResult();
+                    timeTag = setTimeout(getDataList,dataInterval);
+                } else {
+                    return false;  
+                }
+
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+
+       
+    }
+
+    //除气机状态异常 重置
+    function tbReset(obj){
+        var FArea=$(obj).attr("data-FArea");
+        com.submit("除气机状态异常处理",{
+            FSoupCZID:$(obj).attr("data-FSoupCZID"),
+            FNameplateID:$(obj).attr("data-FNameplateID")
+        },function(ret){
+            if(ret.ds[0]["status"] === "000000"){
+                clearShaow(FArea);   
+                isopne[FArea-1]=0;
+            }else{
+                layer.msg(ret.ds[0]["msg"])
+            }
+        }) 
+        
+    }
+
+    //小样标签打印
+    function xiaoyangPrint() {
+        com.submit('api40385', {
+            FSoupCZID: TBdata.FSoupCZID,
+            FType: 0,
+        }, function (data) {
+            if (data.ds[0].status == "000000") {
+                var serialSN = {
+                    q: "CTPC",
+                    n: TBdata.FCodeindx
+                }
+                $.jwPrintList({
+                    Ftype: 'fanchangTM',
+                    isprint: true,
+                    printName: 'Gprinter GP-3120TU',
+                    intOrient: "1",
+                    intPageWidth: "400",
+                    intPageHeight: "300",
+                    printcount: 2, // 打印几份
+                    ArrayMed: [{
+                        FCodeindx: TBdata.FCodeindx,
+                        FCode: TBdata.FCode,
+                        FTBNumber: $("#TBCode").val(),
+                        FDate: TBdata.FDate,
+                        serialSN: JSON.stringify(serialSN)
+                    }]
+                });
+            }
+        });
+        setTimeout(function () {
+            tBsaomiao(TBinfo.FTBNumber);
+        }, 300);
+    }
+
+    //确认提交
+    function comfirmSubmit(_this){
+        var FArea = $(_this).attr("data-FArea");        
+        var ResultMSG = $("#jieguo4"+FArea).val() || "";
+        // var FJytype = $(".inputradio:checked").val() || 999;
+        // var FTBNumber = $(_this).attr("data-FTBNumber");
+
+        var FJytype=$("input[name='jytype"+FArea+"']:checked").val() || 999;
+      //  console.log("提交："+FJytype+" ResultMSG:"+datas.ResultMSG);
+        var datas = {
+            FCompanyID:cid,
+            FJytype:FJytype,
+            FEmplID:localStorage.getItem('FEmplID'),
+            FSoupCZID:$(_this).attr("data-FSoupCZID"),
+            FNameplateID:$(_this).attr("data-FNameplateID"),
+            ResultMSG:ResultMSG,
+            FTBNumber:$(_this).attr("data-FTBNumber"),
+            FArea:FArea
+        }     
+        
+        if (datas.ResultMSG==="NG" && datas.FJytype===999){
+            layer.msg("当前检验结果为NG,请选择处理方式！");
+            return;
+        }else{
+            againShadow(datas);    
+        }           
+    }
+
+    //弹出遮罩层
+    function showShadow(allDatas){        
+       // console.log("allDatas:"+JSON.stringify(allDatas));
+        // dataObj["data-obj"] = obj;
+        var lstr = "";
+        if(allDatas.FCheckResultMSG.toLowerCase() === "ng"){
+        // clearInterval(tbTag);
+            lstr = `<div class="resultTb" style="background:#bd1738;">
+                        <h1 style="background:#bd1738">${allDatas.FTBNumber}</h1>        
+                        <div class="layui-form-item" style="padding-top:20px;">
+                            <label class="layui-form-label tbFont">密度检测结果</label>
+                            <div class="layui-input-inline" style="width:120px;">
+                                <input  style="background: #b5b5b5;border:none"  class="layui-input tbInput" id="jieguo1${allDatas.FArea}" value="${allDatas.FMDCheckResultMSG}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="padding-top:20px;">
+                            <label class="layui-form-label tbFont">K模检验结果</label>
+                            <div class="layui-input-inline" style="width:120px">
+                                <input  id="jieguo2${allDatas.FArea}" class="layui-input tbInput" value="${allDatas.FKModalCheckResultMSG}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="padding-top:20px;">
+                            <label class="layui-form-label tbFont">检验判定结果</label>
+                            <div class="layui-input-inline" style="width:120px">
+                                <input  id="jieguo4${allDatas.FArea}" class="layui-input tbInput" value="${allDatas.FCheckResultMSG}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="z-checkbox" style="margin-left: 10px;">
+                                <input class="inputradio" value="0" type="radio" name="jytype${allDatas.FArea}" id="jytype0${allDatas.FArea}">
+                                <i class="z-checked"></i>
+                                <span class="z-checktxt">手工放行</span>
+                            </label>
+                            <label class="z-checkbox" style="margin-left: 10px;">
+                                <input class="inputradio" value="2" type="radio" name="jytype${allDatas.FArea}" id="jytype2${allDatas.FArea}">
+                                <i class="z-checked"></i>
+                                <span class="z-checktxt">除气除渣</span>
+                            </label>
+                            <label class="z-checkbox" style="margin-left: 10px;">
+                                <input class="inputradio" value="3" type="radio" name="jytype${allDatas.FArea}" id="jytype3${allDatas.FArea}">
+                                <i class="z-checked"></i>
+                                <span class="z-checktxt">直接报废</span>
+                            </label>
+                        </div> 
+                        
+                        <div class="tbSumit">
+                            <button type="button" class="layui-btn" data-FTBNumber="${allDatas.FTBNumber}" data-FNameplateID="${allDatas.FNameplateID}" data-FSoupCZID="${allDatas.FSoupCZID}" data-FArea="${allDatas.FArea}" onclick="comfirmSubmit(this)">确认</button>
+                        </div>                      
+                    </div>`;
+        }else{
+            lstr = lstr = `<div class="resultTb" style="background:rgb(37,184,9);">
+                        <h1 style="background:rgb(37,184,9);">${allDatas.FTBNumber}</h1>        
+                        <div class="layui-form-item" style="padding-top:20px;">
+                            <label class="layui-form-label tbFont">密度检测结果</label>
+                            <div class="layui-input-inline" style="width:120px;">
+                                <input  style="background: #b5b5b5;border:none"  class="layui-input tbInput" id="jieguo1${allDatas.FArea}" value="${allDatas.FMDCheckResultMSG}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="padding-top:20px;">
+                            <label class="layui-form-label tbFont">K模检验结果</label>
+                            <div class="layui-input-inline" style="width:120px">
+                                <input  id="jieguo2${allDatas.FArea}" class="layui-input tbInput" value="${allDatas.FKModalCheckResultMSG}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="padding-top:20px;">
+                            <label class="layui-form-label tbFont">检验判定结果</label>
+                            <div class="layui-input-inline" style="width:120px">
+                                <input  id="jieguo4${allDatas.FArea}" class="layui-input tbInput" value="${allDatas.FCheckResultMSG}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="z-checkbox" style="margin-left: 10px;">
+                                <input class="inputradio" value="0" type="radio" name="jytype${allDatas.FArea}" id="jytype0${allDatas.FArea}" disabled>
+                                <i class="z-checked"></i>
+                                <span class="z-checktxt">手工放行</span>
+                            </label>
+                            <label class="z-checkbox" style="margin-left: 10px;">
+                                <input class="inputradio" value="2" type="radio" name="jytype${allDatas.FArea}" id="jytype2${allDatas.FArea}" disabled>
+                                <i class="z-checked"></i>
+                                <span class="z-checktxt">除气除渣</span>
+                            </label>
+                            <label class="z-checkbox" style="margin-left: 10px;">
+                                <input class="inputradio" value="3" type="radio" name="jytype${allDatas.FArea}" id="jytype3${allDatas.FArea}" disabled>
+                                <i class="z-checked"></i>
+                                <span class="z-checktxt">直接报废</span>
+                            </label>
+                        </div> 
+                        <div class="tbSumit">
+                            <button type="button" class="layui-btn" data-FTBNumber="${allDatas.FTBNumber}" onclick="comfirmSubmit(this)" data-FNameplateID="${allDatas.FNameplateID}" data-FSoupCZID=${allDatas.FSoupCZID} data-FArea="${allDatas.FArea}">确认</button>
+                        </div>
+                        
+                    </div>`;                    
+            }    
+            $(".alert" + allDatas.FArea).html(lstr);      
+            $(".alert" + allDatas.FArea).css("z-index","999991");       
+
+            var alertLeft =  $("#bottomTb" + allDatas.FArea).offset().left+2;
+            var bottWith =  $("#bottomTb" + allDatas.FArea).width()-3;
+            var bottHeight =  $("#bottomTb" + allDatas.FArea).height()+20;
+           // $(".alert" + allDatas.FArea).css("left",alertLeft);
+            $(".alert"+ allDatas.FArea).attr("style", "left:"+alertLeft+"px;");
+            $(".alert" + allDatas.FArea).css("width",bottWith);   
+            $(".alert" + allDatas.FArea).css("height",bottHeight); 
+
+           //  console.log(alertLeft+" alertLeft:"+ $(".alert" + allDatas.FArea).offset().left)   
+          //   console.log(alertLeft+" alertTop:"+ $(".alert" + allDatas.FArea).offset().top)   
+    }
+
+    //清理遮罩层
+    function clearShaow(FArea){
+        $(".alert" + FArea).html("");
+        $(".alert" + FArea).css("z-index","99991"); 
+        clearTimeout(timeTag);
+        getDataList();
+    }
+
+    //打开结果提示框
+    function againShadow(datas){
+//      console.log("FTBNumber:"+datas.FTBNumber);
+//     console.log("FArea:"+datas.FArea);
+//       console.log("FJytype:"+datas.FJytype);
+        var againStr ="";
+        //OK显示
+        if(datas.FJytype===0 || datas.FJytype===999){
+            againStr = `<h1>${datas.FTBNumber}</h1><p>OK</p><button type="button" style="background: rgb(188, 21, 55)");color:white;" data-ResultMSG="${datas.ResultMSG}" data-FNameplateID="${datas.FNameplateID}" data-FSoupCZID="${datas.FSoupCZID}" data-FJytype="${datas.FJytype}" data-FArea="${datas.FArea}" onclick="closeAgain2(this)">关闭</button>`;
+            $(".test" + datas.FArea).css("background","#45c312");
+        }else{            
+            againStr = `<h1>${datas.FTBNumber}</h1><p>NG</p><button type="button" style="background: #ffff48;color:#000000;" data-ResultMSG="${datas.ResultMSG}" data-FNameplateID="${datas.FNameplateID}" data-FSoupCZID="${datas.FSoupCZID}" data-FJytype="${datas.FJytype}" data-FArea="${datas.FArea}" onclick="closeAgain2(this)">关闭</button>`;
+            $(".test" + datas.FArea).css("background","rgb(188, 21, 55)");
+        }
+
+        $(".test" + datas.FArea).html(againStr);
+        $(".test" + datas.FArea).css("display","block");
+        $(".test" + datas.FArea).css("z-index","999992");
+        var testLeft =  $("#bottomTb" + datas.FArea).offset().left+2;
+        var bottWith =  $("#bottomTb" + datas.FArea).width()-3;
+        var bottHeight = $("#bottomTb" + datas.FArea).height()+20;
+        $(".test" + datas.FArea).css("left",testLeft);
+        $(".test" + datas.FArea).css("width",bottWith); 
+        $(".test" + datas.FArea).css("height",bottHeight); 
+    //    console.log("div相对父元素位置:"+$(".test" + datas.FArea).position().left);
+      //  console.log("div绝对位置:"+$(".test" + datas.FArea).offset().left);
+
+        setTimeout(function(){
+            closeAgain(datas.FArea,datas);
+        },5000)
+    }
+
+    //关闭结果提示框
+    var closeArrs = [0,0,0];  //防止重复提交实验室结果处理方式
+    function closeAgain2(_this){
+        var FArea= $(_this).attr("data-FArea");
+        var FSoupCZID = $(_this).attr("data-FSoupCZID");
+        closeArrs[FArea-1] = FSoupCZID;
+        var datas = {
+            FCompanyID:cid,            
+            FEmplID:localStorage.getItem('FEmplID'),
+            FJytype:$(_this).attr("data-FJytype"),
+            FSoupCZID:$(_this).attr("data-FSoupCZID"),
+            FNameplateID:$(_this).attr("data-FNameplateID"),
+            ResultMSG:$(_this).attr("data-ResultMSG")
+        } 
+
+       // console.log("提交11："+JSON.stringify(datas));
+        com.submit("实验室检测提交确定",datas,function(res){
+            if(res.ds[0]["status"] === "000000"){
+                //清理遮罩层
+                clearShaow(FArea);
+                isopne[FArea-1]=0;        
+
+                $(".test" + FArea).html("");
+                $(".test" + FArea).css("display","none");
+                $(".test" + FArea).css("z-index","99989");
+    
+            }else{
+                layer.msg(res.ds[0]["msg"]);
+            }
+        })
+    }
+
+
+    //关闭结果提示框
+    function closeAgain(FArea,datas){
+        if(closeArrs[FArea-1]  == datas.FSoupCZID){
+            closeArrs[FArea-1]  = 0;        
+        }else{
+            $(".test" + FArea).html("");
+            $(".test" + FArea).css("display","none");
+            $(".test" + FArea).css("z-index","99989");
+            // console.log("实验室检测提交确定");
+            
+            // console.log("提交22："+JSON.stringify(datas));
+            com.submit("实验室检测提交确定",datas,function(res){
+                if(res.ds[0]["status"] === "000000"){
+                    //清理遮罩层
+                    clearShaow(FArea);
+                    isopne[FArea-1]=0;    
+                    closeArrs[FArea-1] = datas.FSoupCZID;    
+                }else{
+                    layer.msg(res.ds[0]["msg"]);
+                }
+            })
+        
+        }
+    }
+
+    //监控地磅数组检验结果弹出框
+    function jianTbResult(){
+        var jiantData =[];
+        for(dataObj of dataObject){
+            var FNameplateID=dataObj["FNameplateID"];
+            var FArea=dataObj["FArea"];
+            var FUseStage = dataObj["FUseStage"];
+            var FSoupCZID= dataObj["FSoupCZID"];
+            var FIsOpen= dataObj["FIsOpen"];
+            if(FUseStage === 2  &&  FSoupCZID > 0){
+                // console.log("dataObj:"+JSON.stringify(dataObj))
+                //处理数据循环速度大于接口调用时间                
+                // console.log(FArea)
+                // console.log(isopne[FArea-1])
+                jiantData.push({FSoupCZID:FSoupCZID,FNameplateID:FNameplateID,FArea:FArea});                
+               // jianTFcun(jiantData,FSoupCZID,FNameplateID,FArea);                           
+            }
+
+            if(FIsOpen===0){
+                //清理遮罩
+                $(".alert" + FArea).html("");  
+
+                $(".test" + FArea).html("");
+                $(".test" + FArea).css("display","none");
+                $(".test" + FArea).css("z-index","99989");
+                isopne[FArea-1]=0;
+            }
+        } 
+
+        //DataxmlStr=$.json2xml(JSON数组,{rootTagName:'自定义父节点',firstName:'自定义第一层节点名称'}); console.dirxml() 打印xml对象
+        var jiantDataxml=$.json2xml(jiantData,{rootTagName: 'dataList',firstName:'data'});
+        //监听数据
+        jianTFcun(jiantDataxml);  
+       // console.log("jiantDataxml:"+jiantDataxml);
+    }
+
+    //打开监听到的结果集遮罩页面    
+    function jianTFcun(XMLSTr){   
+        //console.log(XMLSTr);
+        com.submit("汤包检验结果监听",{
+            XMLSTr:XMLSTr
+        },function(allDatas){            
+            if(allDatas.ds[0]["status"] === "000000"){    
+               // console.log("allDatas:"+JSON.stringify(allDatas.ds1));                  
+                for(oneAllObj of allDatas.ds1){        
+                   // console.log("oneAllObj:"+JSON.stringify(oneAllObj));             
+                    if(oneAllObj.FShowStuas===1 && isopne[oneAllObj.FArea-1]=== 0){
+                        isopne[oneAllObj.FArea-1]=1;
+                        showShadow(oneAllObj);  
+                    }else if(oneAllObj.FShowStuas===0 && isopne[oneAllObj.FArea-1]=== 0){
+                         //清理遮罩
+                        $(".alert" + oneAllObj.FArea).html("");  
+
+                        $(".test" + oneAllObj.FArea).html("");
+                        $(".test" + oneAllObj.FArea).css("display","none");
+                        $(".test" + oneAllObj.FArea).css("z-index","99989");
+                        isopne[oneAllObj.FArea-1]=0;
+                    }
+                }                                                
+            }else{
+                // layer.msg(allDatas.ds[0]["msg"]);
+                return;
+            }
+        }) ;   
+    }
+
+    //历史记录
+    function historiyRecords() {
+        location.href = "./history3.html?a=1&cid=" + cid+'&FEmplID=' 
+        + localStorage.getItem('FEmplID') + '&FEmplname=' + escape(localStorage.getItem('FEmplname'));
+    }
+
+     //扫码监听器
+     function scandata(code) {
+        if (/^{/.test(code)) {
+            if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined) {
+                        layer.msg("请扫描员工信息！");
+                        return false;
+           }
+            var obj = eval('(' + code + ')');
+
+            //汤包二维码扫描
+            if (obj.q.toUpperCase() == 'ZYB') {
+                com.submit("api53364", {
+                    FTBNumber: obj.n,
+                    FNameplateID: searchData(dataObject,'FUseStage',1,'FNameplateID'), //当前已扫码除气机二维码
+                }, function (ret) {
+                    if(ret.ds[0]["status"] === "000000"){
+                        //更新打印次数
+                        com.submit("api40385",{FSoupCZID: ret.ds1[0].FSoupCZID,FType:0},function(msg){
+                            if(msg.ds[0]["status"] === "000000"){
+                                $.jwPrintList({
+                                    Ftype: 'fanchangTM',
+                                    isprint: true,
+                                    printName: 'Gprinter GP-3120TU',
+                                    intOrient: "1",
+                                    intPageWidth: "400",
+                                    intPageHeight: "300",
+                                    printcount: 2, // 打印几份
+                                    ArrayMed: [{
+                                        FCodeindx: ret.ds1[0].FCodeindx,
+                                        FCode: ret.ds1[0].FCode,
+                                        FTBNumber: ret.ds1[0].FTBNumber,
+                                        FDate:ret.ds1[0].FDate,
+                                        serialSN: ret.ds1[0].serialSN
+                                    }]
+                                });                    
+                            }else{
+                                layer.msg(msg.ds[0]["msg"]);
+                            }
+                            clearTimeout(timeTag);
+                            getDataList();  
+                        });
+                        
+                        
+                    }else{
+                        layer.msg(ret.ds[0]["msg"]);
+                        clearTimeout(timeTag);
+                        getDataList();
+                    }
+
+                })
+            }
+            else {
+                layer.msg("二维码格式【" + code + "】存在问题无法解析！");
+            }
+        } else {
+            //6位数位员工 二维码
+            if (code.length === 6) {
+                    com.submit('api40248', {
+                        FCardCode: code
+                    }, function (data) {
+                        try {
+                            if (data.ds[0].status === '000000') {
+                                localStorage.setItem('FEmplID', data.ds1[0].FEmplID);
+                                localStorage.setItem('FEmplname', data.ds1[0].FEmplname);
+                                $('#CZG').text(data.ds1[0].FEmplname);
+                                $('#FCardNo').val(data.ds1[0].FEmplname).attr("realvalue", data.ds1[0].FEmplID);
+                                layer.msg(data.ds[0].msg);
+                            } else {
+                                layer.msg(data.ds[0].msg)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    });
+            }            
+            //七位数字为除气机
+            else if (code.length === 7) {
+                //判断操作工信息是否存在
+                if ($('#FCardNo').attr("realvalue") == "" || $('#FCardNo').attr("realvalue") == undefined) {
+                    layer.msg("请扫描员工信息！");
+                    return false;
+                } 
+                // var FArea = searchData(dataObject,'FNameplateID',code,'FArea');//获取指定值
+                // var FNameplDATA = searchData(dataObject,'FNameplateID',code); //获取指定值数组
+                // console.log(FNameplDATA);
+                //除气机信息判断接口
+                com.submit("api53365", {FNameplateID:code}, function (ret) { 
+                    if (ret.ds[0]["status"] === "000000") {
+                        clearTimeout(timeTag);
+                        getDataList()
+                    }else{
+                        layer.msg(ret.ds[0]["msg"]);
+                    }
+                });
+
+            } else {
+                layer.msg("二维码格式【" + code + "】存在问题无法解析！");
+            }
+        }
+     
+    }
+
+</script>
+
+</html>

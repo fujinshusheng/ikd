@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IKD看板</title>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">-->
+    <meta name="viewport" content="width=960,target-densitydpi=480, user-scalable=no">
+    <link rel="shortcut icon" href="#"/>
+    <link rel="stylesheet" href="css/commont.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <link rel="stylesheet" href="css/swiper.css">
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/layer/layer.js"></script>
+    <script src="js/submit.js"></script>
+    <script src="js/Vue.js"></script>
+    <script src="js/swiper.js"></script>
+</head>
+
+<body style="background-image:url(image/bg.jpg)">
+<div class="z-app z-row z-row-column">
+    <header>
+        <h1 :style="table1_style.titlestyle">{{table1_data["看板标题"]}}</h1>
+        <div id="time"></div>
+    </header>
+    <div class="center z-col">
+        <div class="legend" style="position: relative;">
+            <span style="margin-left: 20px;">{{table2_data.标题}}</span>
+            <ul class="legend-list">
+                <li><i class="cir"></i>NG</li>
+                <li><i class="cir" style="background: rgb(37,184,9);"></i>OK</li>
+                <li><i class="cir" style="background: rgb(242,101,2);"></i>检验中</li>
+                <li><i class="cir" style="background: rgb(148,148,148);"></i>出汤/闲置</li>
+            </ul>
+            <div id="soundbtn" style="position: absolute;right: 0;">开启声音</div>
+        </div>
+        <!-- <ul class="kb-row main-list tangbao">
+        <template v-for="table2_item in table2_list">
+            <li>
+            </li>
+        </template>
+    </ul> -->
+        <div style="background: rgb(217, 217, 217); padding: 0px 0px; justify-content: center">
+            <div class="swiper-container" style="height: 180px;">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide centers" v-for="table2_item in table2_list">
+                        <i class="cir cir-lg"
+                           :style="{ background: table2_item.汤包颜色 }">{{table2_item.汤包状态}}</i><br>
+                        <span :style="table2_style.tdstyle">{{table2_item.汤包编号}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="bottom">
+        <div style="clear: both;"></div>
+        <div class="legend">
+            <span style="margin-left: 20px;">{{table1_data.标题}}</span>
+            <ul class="legend-list">
+                <li><i class="cir"></i>称重确认</li>
+                <li><i class="cir" style="background: rgb(242,101,2);"></i>过磅中</li>
+                <li><i class="cir" style="background: rgb(148,148,148);"></i>空载</li>
+            </ul>
+        </div>
+        <ul class="kb-row main-list main-list1">
+            <template v-for="table1_item in table1_list">
+                <li><i class="rect" :style="{ background: table1_item.地磅颜色 }">{{table1_item.地磅名称}}</i></li>
+            </template>
+        </ul>
+    </div>
+
+    <div id="audioBox" style="display: none;">
+        <audio id="audio" preload="true" controls="controls" muted></audio>
+    </div>
+    <div class="z-alert" v-show="musictxtshow">
+        <div class="z-alert_box" v-html="musictxt" :style="msgstyle"></div>
+        <div class="z-alert_bg"></div>
+    </div>
+
+    <!--<iframe id="iframe" style="display: none" src="test2.html"></iframe>-->
+</div>
+
+
+<script>
+    Vue.config.productionTip = false;
+
+    //时间的跳动
+    function getDate() {
+        var date = new Date();
+        var y = date.getFullYear(); //年
+        var m = date.getMonth() + 1; //月
+        m = m < 10 ? ('0' + m) : m;
+        var d = date.getDate();//日
+        d = d < 10 ? ('0' + d) : d;
+        var h = date.getHours();//时
+        h = h < 10 ? ('0' + h) : h;
+        var minute = date.getMinutes();//分
+        minute = minute < 10 ? ('0' + minute) : minute;
+        var second = date.getSeconds(); //秒
+        second = second < 10 ? ('0' + second) : second;
+
+        var datestr = y + "年" + m + "月" + d + "日 " + h + ":" + minute + ":" + second;
+        $("#time").html(datestr);
+    }
+
+    //循环的滚动
+    function Scroll() {
+        var element = $(".tangbao");
+        //element.scrollLeft = element.scrollLeft + 100;
+        //element[0].offsetWidth = ;
+    }
+
+    var sound = 0;
+    //function iframeload() {
+    //    setTimeout(function () {
+    //        if(sound == 0){
+    //            console.log(222);
+    //            $("#soundbtn").click();
+    //        }
+    //    },3000);
+    //}
+
+    //初始化获取工厂ID
+    var cid = getUrlname('cid') || 67;
+
+
+    //初始化汤包显示数量
+    var tbshow = 5;
+    window.onload = function () {
+        getDate();
+        setInterval("getDate()", 990);
+        setInterval('Scroll()', 1000);
+
+        //开关声音按钮
+        $(document).on("click", "#soundbtn", function () {
+            if (sound == 0) {
+                $(this).html("关闭声音");
+                sound = 1;
+            } else {
+                $(this).html("开启声音");
+                sound = 0;
+            }
+        });
+
+        // var audioiframe = document.getElementById("audioiframe");
+        // audioiframe.src = "http://localhost:63342/kanban/wusheng.mp3";
+
+        $(function () {
+             setTimeout(function () {
+                 $("#soundbtn").click()
+             }, 1000 * 3);
+        });
+
+        var timeobj;
+        var isplay = 1;
+        var opplay = 1;
+        function audioplay(arr) {
+            if (sound == 0) {
+                myVue.musictxtshow = false;
+                myVue.ismusic = false;
+                return;
+            }
+            
+            var aplay;
+            var myAudio = document.getElementById("audio");
+            var arrdata = arr.pop()
+            myAudio.loop = false;//禁止循环，否则无法触发ended事件
+            myAudio.src = arrdata.FPromptSound;         //每次读数组最后一个元素
+            myVue.musictxt = arrdata.FPrompt;
+            myVue.musictxtshow = true;
+            myAudio.addEventListener('ended', playEndedHandler, false);
+            myAudio.addEventListener('error', function (e) {
+                clearTimeout(timeobj);
+                timeobj = setTimeout(function () {
+                    myVue.musictxtshow = false;
+                    myVue.ismusic = false;
+                    myAudio.removeEventListener('ended', playEndedHandler, false);
+                },5000);
+            });
+            myAudio.addEventListener('play', function (e) {
+                opplay = 2;
+            });
+
+            timeobj = setTimeout(function () {
+                alerttextchange();
+                // myVue.musictxtshow = false;
+                // myVue.ismusic = false;
+            },3500);
+
+            //浏览器不支持播放操作处理
+            //if (isplay == 1) {
+                aplay = myAudio.play();
+            //}
+            //setTimeout(function () {
+            //    if (opplay == 1) {
+            //        isplay = 2;
+            //    } else {
+            //        isplay = 1;
+            //    }
+            //}, 500);
+            
+
+            function playEndedHandler() {
+                clearTimeout(timeobj);
+                timeobj = setTimeout(function () {
+                    if (myAudio.ended) {
+                        if (aplay) {
+                            myAudio.pause();
+                        }
+                        if (arr.length > 0) {
+                            myVue.musictxtshow = true;
+                            arrdata = arr.pop();
+                            // console.log(arrdata);
+                            myAudio.src = arrdata.FPromptSound;
+                            myVue.musictxt = arrdata.FPrompt;
+                            myAudio.play();
+                        } else {
+                            myVue.musictxtshow = false;
+                            myAudio.removeEventListener('ended', playEndedHandler, false);
+                            myVue.ismusic = false;
+                        }
+                    }
+                },100);
+            }
+            function alerttextchange() {
+                clearTimeout(timeobj);
+                setTimeout(function () {
+                    //console.log(JSON.stringify(arr));
+                    if (arr.length > 0) {
+                        myVue.musictxtshow = true;
+                        arrdata = arr.pop();
+                        // console.log(arrdata);
+                        myVue.musictxt = arrdata.FPrompt;
+                        alerttextchange();
+                    } else {
+                        myVue.musictxtshow = false;
+                        myVue.ismusic = false;
+                    }
+                },1000);
+            }
+        }
+
+        var change = true;
+        var mySwiper;
+
+        var myVue;
+        myVue = new Vue({
+            el: ".z-app",
+            data: {
+                table1_th: {},
+                table1_list: [],
+                table1_data: {},
+                table1_style: {},
+                table2_th: {},
+                table2_list: [],
+                table2_data: {},
+                table2_style: {},
+
+                time1: 30000,
+                time2: 30000,
+                table1_error: {
+                    num: 0
+                },
+                table2_error: {
+                    num: 0
+                },
+                musiclist: [],
+                ismusic: false,
+                musictxt: "",
+                musictxtshow: false,
+                msgstyle: {},
+            },
+            created: function () {
+                var _this = this;
+                _this.getlist();
+                _this.getlist2();
+                setTimeout(function () {
+                    //  console.log('自动刷新:' + change);
+                    if (_this.table2_list.length > tbshow) {
+                        _this.startSwiper(true);
+                        change = false;
+                    } else {
+                        _this.startSwiper(false);
+                    }
+                }, 800)
+            },
+            computed: {},
+            methods: {
+                startSwiper: function (play) {
+                    if (mySwiper != undefined) {
+                        mySwiper.destroy(false);
+                    }
+                    mySwiper = new Swiper('.swiper-container', {
+                        loop: true,
+                        slidesPerView: tbshow,
+                        autoplay: play,
+                    });
+                },
+                tdstylefun: function (table2_style, td, key, value) {
+                    var style = table2_style.tdstyle;
+                    if (td.tdstyle != undefined || td.tdstyle != null) {
+
+                        var style1 = eval('(' + td.tdstyle + ')');
+                        for (var i = 0; i < style1.length; i++) {
+                            if (style1[i].show != undefined && (style1[i].show == true || style1[i].show == "true")) {
+                                if (style1[i].title == key) {
+                                    return style1[i].style;
+                                }
+                            }
+                        }
+                    } else {
+                        return table2_style.tdstyle
+                    }
+                },
+                showtd: function (key, th) {
+                    for (var i in th) {
+                        if (key == i) {
+                            return true
+                        }
+                    }
+
+                    return false;
+                    var tdstyle = td.tdstyle;
+                    try {
+                        tdstyle = eval("(" + tdstyle + ")");
+                    } catch (e) {
+
+                    }
+                    console.log(key)
+                    if (key != "tdstyle") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+                musicfun: function () {
+                    if (this.musiclist.length > 0) {
+                        this.ismusic = true;
+                        audioplay(this.musiclist);
+                    }
+                },
+                getlist: function () {
+                    var _this = this;
+
+                    try {
+                        //地磅
+                        submit("api41887", {FCompanyID: cid}, function (datas) {
+                            _this.table1_error.num = 0;
+
+                            if (datas.status == "200") {
+                                var ret = "";
+                                if (datas.data == undefined) {
+                                    ret = datas.msg;
+                                } else {
+                                    ret = datas.data;
+                                }
+                                if (ret.ds[0].status == "000000") {
+                                    _this.table1_list = ret.ds1;
+                                    //_this.table1_th = ret.ds2[0];
+                                    if (ret.ds2 != undefined && ret.ds2.length > 0) {
+                                        _this.table1_data = ret.ds2[0];
+                                        _this.time1 = ret.ds2[0].time;
+                                        _this.table1_style = eval('(' + ret.ds2[0].style + ')');
+                                        _this.msgstyle = eval('(' + ret.ds2[0].msgstyle + ')');
+                                    }
+
+                                    if (ret.ds3 != undefined && ret.ds3.length > 0) {
+                                        _this.musiclist = ret.ds3;
+                                        if (!_this.ismusic) {
+                                            _this.musicfun();
+                                        }
+                                    }
+
+                                    try {
+                                        _this.table1_style = eval("(" + _this.table1_data.style + ")");
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                } else {
+                                    layer.msg(ret.ds[0].msg);
+                                    // _this.$nextTick(function(){
+                                    //     tablescroll("#tablist1");
+                                    // })
+                                }
+                                setTimeout(function () {
+                                    _this.getlist();
+                                }, _this.time1)
+                            } else {
+                                layer.msg(datas.msg);
+                                setTimeout(function () {
+                                    _this.getlist();
+                                }, _this.time1)
+                            }
+                        }, {
+                            jz: false,
+                            returnall: true,
+                            timeout: 30000,
+                            runJsonP: true,
+                            errcallback: function (XMLHttpRequest, textStatus, errorThrown) {
+                                _this.table1_error.num = parseInt(_this.table1_error.num) + 1;
+
+                                var s = 30000 * _this.table1_error.num * 2;
+                                if (s > 299999) {
+                                    s = 299999;
+                                }
+                                setTimeout(function () {
+                                    _this.getlist();
+                                }, s)
+                            }
+                        })
+                    } catch (e) {
+                        _this.table1_error.num = parseInt(_this.table1_error.num) + 1;
+                        var s = 30000 * _this.table1_error.num * 2;
+                        if (s > 299999) {
+                            s = 299999;
+                        }
+                        setTimeout(function () {
+                            _this.getlist();
+                        }, s)
+                    }
+                },
+                getlist2: function () {
+                    var _this = this;
+
+                    try {
+                        //汤包
+                        submit("api41901", {FCompanyID: cid}, function (datas) {
+                            _this.table2_error.num = 0;
+
+                            if (datas.status == "200") {
+                                var ret = "";
+                                if (datas.data == undefined) {
+                                    ret = datas.msg;
+                                } else {
+                                    ret = datas.data;
+                                }
+                                if (ret.ds[0].status == "000000") {
+                                    if (JSON.stringify(_this.table2_list) != JSON.stringify(ret.ds1)) {
+                                        change = true;
+                                    }
+                                    //_this.table2_th = ret.ds2[0];
+                                    if (ret.ds2 != undefined && ret.ds2.length > 0) {
+                                        _this.table2_data = ret.ds2[0];
+                                        _this.time2 = ret.ds2[0].time;
+                                        tbshow = ret.ds2[0].pages || 5;
+                                        _this.table2_style = eval('(' + ret.ds2[0].style + ')');
+                                    }
+                                    try {
+                                        _this.table2_style = eval("(" + _this.table2_data.style + ")");
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+
+                                    _this.table2_list = ret.ds1;
+                                    _this.$nextTick(function () {
+                                        if (change) {
+                                            if (_this.table2_list.length > tbshow) {
+                                                //   console.log('汤包接口刷新:' + change);
+                                                _this.startSwiper(true);
+                                                change = false;
+                                            } else {
+                                                // setTimeout(function () {
+                                                _this.startSwiper(false);
+                                                //  }, 300);
+                                            }
+                                        }
+                                    })
+
+                                } else {
+                                    layer.msg(ret.ds[0].msg);
+                                    // _this.$nextTick(function(){
+                                    //     tablescroll("#tablist1");
+                                    // })
+                                }
+                                setTimeout(function () {
+                                    _this.getlist2();
+                                }, _this.time2)
+                            } else {
+                                layer.msg(datas.msg);
+                                setTimeout(function () {
+                                    _this.getlist2();
+                                }, _this.time2)
+                            }
+                        }, {
+                            jz: false,
+                            returnall: true,
+                            timeout: 30000,
+                            runJsonP: true,
+                            errcallback: function (XMLHttpRequest, textStatus, errorThrown) {
+                                _this.table2_error.num = parseInt(_this.table2_error.num) + 1;
+
+                                var s = 30000 * _this.table2_error.num * 2;
+                                if (s > 299999) {
+                                    s = 299999;
+                                }
+                                setTimeout(function () {
+                                    _this.getlist2();
+                                }, s)
+                            }
+                        })
+                    } catch (e) {
+                        _this.table2_error.num = parseInt(_this.table2_error.num) + 1;
+                        var s = 30000 * _this.table2_error.num * 2;
+                        if (s > 299999) {
+                            s = 299999;
+                        }
+                        setTimeout(function () {
+                            _this.getlist2();
+                        }, s)
+                    }
+                },
+
+            },
+            watch: {},
+        });
+    }
+    $(function () {
+        layer.msg('当前页面版本:v1.0.29');
+        //    setTimeout(function () {
+        // doscroll('.tangbao li:first-child', $('.tangbao li').width(), 1);
+
+        //    }, 2000)
+    })
+    // //表格轮播
+    // function doscroll(dom, num, cishu) {
+    //     cishu = cishu || 0;
+    //     //console.log(num);
+    //     try {
+    //         $(dom).animate({
+    //             marginLeft: "-=" + num
+    //         }, 4000, 'linear', function () {
+    //             $(dom).css({
+    //                 "margin-left": "0px"
+    //             });
+    //             $(dom).parent().append($(dom).remove());
+    //             //表格轮播
+    //             cishu++;
+    //             //console.log(cishu);
+    //             if (cishu < 10) {
+    //                 //doscroll(dom, num, cishu);
+    //             }
+    //             doscroll(dom, num, cishu);
+    //         });
+    //     } catch (e) {
+    //         console.error(e)
+    //     }
+    // }
+
+</script>
+</body>
+
+</html>

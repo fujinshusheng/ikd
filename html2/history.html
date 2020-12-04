@@ -1,0 +1,296 @@
+﻿<html>
+<head>
+    <meta charset="utf-8">
+    <title>铝液称重记录列表</title>
+    <link rel="stylesheet" href="../css/pagination.css">
+    <!-- <link rel="stylesheet" href="../js/layui/css/layui.css"> -->
+    <link rel="stylesheet" type="text/css" href="../css/base.css" media="screen">
+    <script type="text/javascript" src="../js/jquery-1.8.2.js"></script>
+    <!-- <script src="../js/layui/layui.js"></script>
+    <script src="../js/layer/layer.js"></script> -->
+    <script src="../js/common.js"></script>
+    <script src="../js/pagination.min.js"></script>
+    <!--    <script type="text/javascript" src="../js/json2.js"></script>-->
+<!--    <script type="text/javascript" src="../js/api1.js?t=201910241643"></script>-->
+    <script src="../js/Lodop/LodopFuncs.js"></script>
+    <script src="../js/Lodop/jwPrintList_shi.js"></script>
+    <style>
+         .cib {
+            padding: 5px 2px;
+        }
+
+        .cib input {
+            vertical-align: bottom;
+            height: 20px;
+            color: #567e84;
+            margin: 2px 0px;
+        }
+
+        .cib button {
+            vertical-align: bottom;
+            height: 26px;
+            cursor: pointer;
+            background-color: #cbefff;
+            border: 1px solid #44a8d6;
+            color: #567e84;
+            margin: 2px 0px;
+        }
+
+        .desc {
+            padding-left: 2px;
+            color: #657e9a;
+        }
+
+        .desc-red {
+            padding-left: 2px;
+            color: red;
+        }
+
+        .code-con{
+            font-size: 18px;
+        }
+
+        .hr-c{
+            background-color: #2196F3;
+            height: 5px;
+            border: 0px;
+        }
+    </style>
+</head>
+<body style="background-image: url(../images/bg2.jpg);">
+<!--头部 begin-->
+<div class="ikd_head">
+    <img src="../images/logo.gif" class="ikd_hdImg">
+    <span class="ikd_hdTit">原材料追溯系统</span>
+    <span class="ikd_hdTit1">极望J9产品追溯系统</span>
+
+
+    <div class="ikd_hdCls">
+        <button class="ikd_hdCls1">_</button>
+        <button class="ikd_hdCls2"></button>
+    </div>
+
+    <div class="ikd_hdBtu">
+        <span class="ikd_hdBtu1">操作工：<i id="CZG"></i></span>
+        <!--<button class="ikd_hdBtu3" onclick="parent.closeFrame()">退出登录</button>
+    <button class="ikd_hdBtu3" onclick="parent.closeFrame()">返回主页</button>
+        -->
+
+    </div>
+</div>
+<!--头部 end-->
+<script>
+    function outlogin() {
+       // $.get("?cmd=9999", function () {
+       //     window.location = "/pc/aspx/login.aspx";
+      //  });
+    }
+</script>
+<!--内容 begin-->
+<div class="ikd_con pr">
+    <p class="ikd_cTit">
+        <i></i>铝液称重记录 <a class="ikd_cRtrn" onclick="history.back()">返回上一页</a></p>
+    <div style="overflow:auto; height: 570px;">
+        <table class="ikd_cB ikd_cB2" border="0">
+            <thead>
+            <tr>
+                <td>
+                    <label class="ikd_cbTit3">
+                        工厂</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        地磅名称</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        称重类型</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        汤包编号</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        出汤批次</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        称重重量</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        操作工姓名</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        称重时间</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        打印次数</label>
+                </td>
+                <td>
+                    <label class="ikd_cbTit3">
+                        操作</label>
+                </td>
+            </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+    <div class="clear">
+    </div>
+    <!--页码 begin-->
+    <div id="divPage"></div>
+    <!--页码 end-->
+</div>
+<!--内容 end-->
+<script type="text/html" id="dataRowHtml">
+    <tr>
+        <td><div class="ikd_cbConl">{工厂}</div></td>
+        <td><div class="ikd_cbConl">{地磅名称}</div></td>
+        <td><div class="ikd_cbConl">{称重类型}</div></td>
+        <td><div class="ikd_cbConl">{汤包编号}</div></td>
+        <td><div class="ikd_cbConl">{出汤批次}</div></td>
+        <td><div class="ikd_cbConl">{称重重量}</div></td>
+        <td><div class="ikd_cbConl">{操作工姓名}</div></td>
+        <td><div class="ikd_cbConl">{称重时间}</div></td>
+        <td><div class="ikd_cbConl">{打印次数}</div></td>
+        <td><div class="ikd_cbConl">{操作}</div></td>
+    </tr>
+</script>
+
+
+<script type="text/javascript">
+    // 获取地址栏参数
+    function getUrlname(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+
+
+    $(document).on("click",".dayin",function () {
+        var FSoupCZID = $(this).data("fid");
+        com.submit('api40385',{
+            FSoupCZID: FSoupCZID,
+            FType: 1, // 打印类型，0确定，1补打
+        },function (data) {
+            if (data.ds[0].status == "000000"){
+
+                com.submit('api40662',{
+                    FSoupCZID: FSoupCZID,
+                },function (datas) {
+                    if (datas.ds != undefined && datas.ds.length > 0){
+                        $.jwPrintList({
+                            Ftype: 'fanchangTM',//打印格式名称
+                            //true：直接打印，false：预览
+                            isprint: true,
+                            //打印机名称（不填则使用默认打印机）
+                            printName: 'Gprinter GP-3120TU',
+                            /*
+                           打印方向及纸张类型，数字型，
+                           1---纵(正)向打印，固定纸张；
+
+                           2---横向打印，固定纸张；
+                           3---纵(正)向打印，宽度固定，高度按打印内容的高度自适应；
+                           0(或其它)----打印方向由操作者自行选择或按打印机缺省设置；
+                           */
+                            intOrient: "1",
+			    intPageWidth: "400",
+              		    intPageHeight: "300",
+			    printcount: 1, // 打印几份
+                            ArrayMed: datas.ds
+                        });
+                        location.reload();
+                    }
+                });
+            }
+        });
+    })
+
+ 
+    $(function () {
+        getList();
+
+        //操作工信息赋值
+        setFEmplyee();           
+    });
+
+    function setFEmplyee() {
+        $('#CZG').text(unescape(getUrlname("FEmplname"))).attr("FEmplID", getUrlname("FEmplID"));
+    }
+
+    //页码
+    var pageIndex_ = 1;
+    var pageSize_=10;
+    function getList() {
+        //称重历史数据api40314
+        com.submit('称重历史记录',{
+            FTruckscalesID: getUrlname("FTruckscalesID"),
+            FCompanyID:getUrlname("FCompanyID"),
+            PageIndex:pageIndex_,
+            PageSize:pageSize_
+        },function (data) {
+            // console.log(data);
+            try {
+                var model = $('#dataRowHtml').html(),html = '';
+                data.ds1.forEach(function (value) {
+                    html += model.replace(/{地磅名称}/g, '' + value.FTruckscalesName)
+                        .replace(/{汤包编号}/g, '' + value.FTBNumber)
+                        .replace(/{出汤批次}/g, '' + value.FCodeindx)
+                        .replace(/{称重重量}/g, '' + value.FWeight)
+                        .replace(/{称重时间}/g, '' + value.FDate)
+                        .replace(/{操作工姓名}/g, '' + value.FEmplName)
+                        .replace(/{工厂}/g, '' + value.FCompanyName)
+                        .replace(/{称重类型}/g, '' + value.FStatusName)
+                        .replace(/{打印次数}/g, '' + value.FPrintSum)
+                        .replace(/{操作}/g, '<button class="dayin" data-fid="'+value.FSoupCZID+'">打印</button>')
+                });                   
+                $('#tbody').html(html);
+
+                //页码信息加载
+                $("#divPage").whjPaging({
+                    css: 'css-2',
+                    // currPage:pageIndex_,
+                    // totalSize: data.ds[0].Pcount,//总记录数
+                    // totalPage: data.ds[0].PcountPages, //总页码数                        
+                    isShowSkip: false,
+                    pageSizeOpt: [
+                        {value: 10, text: '10条/页', selected: true},
+                        {value: 20, text: '20条/页'},
+                        {value: 40, text: '40条/页'},
+                        {value: 80, text: '80条/页'}
+                    ],
+                    // isShowTotalSize: false,
+                    // isShowTotalPage: false,
+                    // isShowRefresh: false,
+                    // isShowPageSizeOpt: false,
+                    // isShowFL: false,
+                    callBack: function (currPage, pageSize) {
+
+                        // console.log('currPage:' + currPage + '     pageSize:' + pageSize);
+                        pageIndex_=currPage;
+                        pageSize_=pageSize;
+                        getList() ;
+
+                    }
+                });
+
+                //setPage方法
+                $("#divPage").whjPaging("setPage", {currPage: pageIndex_, totalPage: data.ds[0].PcountPages, totalSize: data.ds[0].Pcount});
+
+            }catch (e) {
+                console.error(e)
+            }
+        });
+    }
+    
+
+</script>
+</body>
+</html>
